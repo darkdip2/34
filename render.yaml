@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: matchday-2027
+    runtime: static
+    # Regenerates public/index.html from src/app.html on every push.
+    buildCommand: node build.js
+    staticPublishPath: ./public
+    pullRequestPreviewsEnabled: false
+    headers:
+      # The page is the app. Never let a CDN serve a stale plan.
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

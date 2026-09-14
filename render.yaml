@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: matchday-2027
+    name: 26-10-27
     runtime: static
     # Regenerates public/index.html from src/app.html on every push.
     buildCommand: node build.js

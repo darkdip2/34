@@ -1,4 +1,4 @@
-# Matchday 2027
+# 26_10_27
 
 A 59-week operating console for the run from data analyst to a professional
 football contract by **26 October 2027**.

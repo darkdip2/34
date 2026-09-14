@@ -35,7 +35,7 @@ if (forbidden.test(body)) {
 
 // Pull the <title> so the standalone document carries the same name.
 const titleMatch = body.match(/<title>([\s\S]*?)<\/title>/i);
-const title = titleMatch ? titleMatch[1].trim() : "Matchday 2027";
+const title = titleMatch ? titleMatch[1].trim() : "26_10_27";
 
 const doc = `<!doctype html>
 <html lang="en">

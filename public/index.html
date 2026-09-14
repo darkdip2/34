@@ -307,6 +307,24 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
   </div>
 
   <div class="sec">
+    <div class="sec-h"><h2>The ledger file</h2><span class="note" id="jSize">—</span></div>
+    <div class="panel pad">
+      <p class="lede" style="margin:0 0 11px">Everything above lives in one JSON document.
+        Copy it out as a backup, or paste one in to restore &mdash; this is also how you move
+        progress onto a device that does not sync.</p>
+      <textarea id="jBox" spellcheck="false" aria-label="Ledger JSON"
+        style="width:100%;min-height:120px;font:500 11.5px var(--mono);background:var(--panel-2);
+        color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:10px;resize:vertical"></textarea>
+      <div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap;align-items:center">
+        <button class="btn" id="jCopy">Copy</button>
+        <button class="btn" id="jDl">Download</button>
+        <button class="btn" id="jImport">Import what is in the box</button>
+        <span class="mono" style="font-size:11px;color:var(--ink-3)" id="jMsg"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
     <div class="sec-h"><h2>Debt</h2><span class="note">Shortfall owed back</span></div>
     <div class="panel pad">
       <div class="kv"><span class="k">Outstanding</span><span class="v" id="dOut">—</span></div>
@@ -423,21 +441,97 @@ var DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
 function fmt(d){return d.getDate()+" "+MON[d.getMonth()]+" "+d.getFullYear()}
 function h1(n){return (Math.round(n*10)/10).toFixed(1)}
 
-var S=pymd(START), E=pymd(END), DB=null, ALL={}, cur, timers={};
-function lsG(p){try{return JSON.parse(localStorage.getItem("inv:"+p)||"null")}catch(e){return null}}
-function lsS(p,v){try{localStorage.setItem("inv:"+p,JSON.stringify(v))}catch(e){}}
-function day(k){if(!ALL[k])ALL[k]=lsG("log/"+k)||{};return ALL[k]}
-function saveDay(k){
-  lsS("log/"+k,ALL[k]);
-  if(!DB)return;
-  clearTimeout(timers[k]);
-  timers[k]=setTimeout(function(){try{DB.collection("log").doc(k).set(ALL[k])["catch"](function(){})}catch(e){}},450);
+var S=pymd(START), E=pymd(END), DB=null, cur, saveTimer=null;
+
+/* ---------- storage: one JSON document holds everything ----------
+   LG = { v, days: { "YYYY-MM-DD": {tech,fb,card,t} }, cp: {id:true} }
+
+   One blob rather than a document per day: a single read on load, a single
+   debounced write, and the same shape in localStorage, in the artifact store
+   and in an export file. A full year of entries is roughly 50 KB, well inside
+   the 256 KiB the store allows per document.
+
+   The cost of one blob is last-writer-wins across devices, so every day entry
+   carries `t` (write time) and merges are resolved per day, newest wins. Edit
+   Tuesday on the phone and Wednesday on the laptop and both survive. */
+var LKEY="inv:ledger", DPATH="ledger/state";
+var LG={v:1,days:{},cp:{}};
+
+function blank(){return {v:1,days:{},cp:{}}}
+function readLocal(){
+  try{var r=JSON.parse(localStorage.getItem(LKEY)||"null");
+    if(r&&r.days)return {v:r.v||1,days:r.days||{},cp:r.cp||{}};}catch(e){}
+  return null;
 }
-var ST={};
-function stG(){if(!ST.cp)ST.cp=lsG("state/cp")||{};return ST.cp}
-function stS(){lsS("state/cp",ST.cp);if(!DB)return;
-  clearTimeout(timers.cp);
-  timers.cp=setTimeout(function(){try{DB.doc("state/cp").set(ST.cp)["catch"](function(){})}catch(e){}},450);}
+function writeLocal(){try{localStorage.setItem(LKEY,JSON.stringify(LG))}catch(e){}}
+
+/* Fold the old per-day keys into the blob once, then clear them. */
+function migrate(){
+  var moved=0;
+  try{
+    for(var i=localStorage.length-1;i>=0;i--){
+      var k=localStorage.key(i);
+      if(!k)continue;
+      if(k.indexOf("inv:log/")===0||k.indexOf("m27:log/")===0){
+        var d=k.slice(k.indexOf("log/")+4), v=null;
+        try{v=JSON.parse(localStorage.getItem(k))}catch(e){}
+        if(v&&!LG.days[d]&&(v.tech||v.fb||v.card)){LG.days[d]={tech:v.tech||{},fb:v.fb||{},card:!!v.card,t:0};moved++}
+        localStorage.removeItem(k);
+      }else if(k==="inv:state/cp"||k==="m27:state/cp"){
+        var c=null; try{c=JSON.parse(localStorage.getItem(k))}catch(e){}
+        if(c)for(var q in c)if(!LG.cp[q])LG.cp[q]=c[q];
+        localStorage.removeItem(k);
+      }
+    }
+  }catch(e){}
+  return moved;
+}
+
+/* Newest write wins, resolved per day rather than per document. */
+function merge(remote){
+  if(!remote||!remote.days)return false;
+  var changed=false;
+  for(var d in remote.days){
+    var r=remote.days[d], m=LG.days[d];
+    if(!m||(r.t||0)>(m.t||0)){LG.days[d]=r;changed=true}
+  }
+  for(var c in (remote.cp||{}))if(!LG.cp[c]){LG.cp[c]=remote.cp[c];changed=true}
+  return changed;
+}
+
+/* Reading a date must not create a record for it — otherwise simply paging
+   through the calendar fills the blob with hollow days. Only a write creates. */
+function day(k){return LG.days[k]||{tech:{},fb:{},card:false,t:0}}
+function dayW(k){if(!LG.days[k])LG.days[k]={tech:{},fb:{},card:false,t:0};return LG.days[k]}
+function empty(l){
+  if(l.card)return false;
+  for(var a in (l.tech||{}))if(+l.tech[a]>0)return false;
+  for(var b in (l.fb||{}))if(l.fb[b])return false;
+  return true;
+}
+function touch(k){
+  var l=LG.days[k];
+  if(!l)return;
+  if(empty(l))delete LG.days[k]; else l.t=Date.now();
+}
+function stG(){return LG.cp}
+
+function persist(){
+  writeLocal();
+  if(!DB)return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){
+    // re-read before writing so a change made on another device is not clobbered
+    try{
+      DB.doc(DPATH).get().then(function(s){
+        if(s.exists)merge(s.data());
+        return DB.doc(DPATH).set(LG);
+      })["catch"](function(){});
+    }catch(e){}
+  },600);
+}
+function saveDay(k){touch(k);persist()}
+function stS(){persist()}
 
 function todayC(){var t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
   return t<S?S:(t>E?E:t)}
@@ -452,7 +546,7 @@ function fbDone(l,dw){var t=0,a=FB[dw].i,d=l.fb||{};
 function originDay(){
   var n=dif(S,todayC());
   for(var k=0;k<=n;k++){
-    var l=ALL[ymd(addD(S,k))]||lsG("log/"+ymd(addD(S,k)));
+    var l=LG.days[ymd(addD(S,k))];
     if(l&&(techSum(l)>0||(l.fb&&Object.keys(l.fb).length>0)||l.card))return k;
   }
   return n;
@@ -465,7 +559,7 @@ function computeAll(){
   for(var i=0;i<TECH.length;i++)r.byMetric[TECH[i][0]]=0;
   var pass=[], n=dif(S,t), curMonth=ymd(t).slice(0,7), run=0, best=0, credit=0, owed=0;
   for(var k=0;k<=n;k++){
-    var d=addD(S,k), key=ymd(d), dw=d.getDay(), l=ALL[key]||lsG("log/"+key)||{};
+    var d=addD(S,k), key=ymd(d), dw=d.getDay(), l=LG.days[key]||{};
     var tq=TECH_REQ[dw], ts=techSum(l), fq=fbReq(dw), fs=fbDone(l,dw), card=!!l.card;
     var logged=ts>0||fs>0||card;
     if(logged)r.days++;
@@ -484,7 +578,7 @@ function computeAll(){
     pass.push({key:key,tech:ts,fb:fs/60});
   }
   // today counts toward the streak as soon as it qualifies
-  var tl=ALL[ymd(t)]||lsG("log/"+ymd(t))||{}, tdw=t.getDay();
+  var tl=LG.days[ymd(t)]||{}, tdw=t.getDay();
   var tOk=(techSum(tl)>=TECH_REQ[tdw]*BAR)&&((fbDone(tl,tdw)>=fbReq(tdw)*BAR)||!!tl.card);
   r.streak=run+(tOk?1:0);
   r.best=Math.max(best,r.streak);
@@ -575,7 +669,7 @@ function rDaily(){
   for(var z=0;z<fbs.length;z++)fbs[z].addEventListener("change",onFb);
 }
 function onTech(ev){
-  var l=day(ymd(cur)); if(!l.tech)l.tech={};
+  var l=dayW(ymd(cur)); if(!l.tech)l.tech={};
   var k=ev.target.getAttribute("data-m"), val=ev.target.value===""?null:Math.max(0,+ev.target.value||0);
   if(val===null)delete l.tech[k]; else l.tech[k]=val;
   var s=techSum(l);
@@ -583,13 +677,13 @@ function onTech(ev){
   saveDay(ymd(cur)); rDaily(); rHeader();
 }
 function onFb(ev){
-  var l=day(ymd(cur)); if(!l.fb)l.fb={};
+  var l=dayW(ymd(cur)); if(!l.fb)l.fb={};
   var k=ev.target.getAttribute("data-f");
   if(ev.target.checked)l.fb[k]=true; else delete l.fb[k];
   saveDay(ymd(cur)); rDaily(); rHeader();
 }
 document.getElementById("cardBtn").addEventListener("click",function(){
-  var l=day(ymd(cur));
+  var l=dayW(ymd(cur));
   if(l.card)delete l.card; else l.card=true;
   saveDay(ymd(cur)); rDaily(); rHeader();
 });
@@ -654,7 +748,53 @@ function rStore(){
   document.getElementById("chart").innerHTML=gh;
   document.getElementById("dOut").textContent=R.debt>0?h1(R.debt)+" hrs":"none";
   document.getElementById("dClear").textContent=R.debt>0?"log beyond the daily requirement":"balanced";
+
+  var js=JSON.stringify(LG), box=document.getElementById("jBox");
+  if(document.activeElement!==box)box.value=js;
+  document.getElementById("jSize").textContent=(js.length/1024).toFixed(1)+" KB · "+
+    Object.keys(LG.days).length+" days";
 }
+
+function jmsg(t){var e=document.getElementById("jMsg");e.textContent=t;
+  setTimeout(function(){if(e.textContent===t)e.textContent=""},2600)}
+document.getElementById("jCopy").addEventListener("click",function(){
+  var b=document.getElementById("jBox");b.select();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(b.value).then(function(){jmsg("Copied")},
+      function(){jmsg("Select the box and copy manually")});
+  }else{try{document.execCommand("copy");jmsg("Copied")}catch(e){jmsg("Select the box and copy manually")}}
+});
+document.getElementById("jDl").addEventListener("click",function(){
+  var name="investiture-ledger-"+ymd(new Date())+".json", data=JSON.stringify(LG,null,2);
+  // The artifact viewer blocks page-initiated downloads, so ask the host when it can.
+  if(window.claude&&typeof window.claude.use==="function"){
+    window.claude.use("downloads").then(function(d){
+      if(d&&d.save){d.save({filename:name,data:data}).then(function(){jmsg("Saved")},
+        function(){jmsg("Download declined")});}
+      else blobDl(name,data);
+    })["catch"](function(){blobDl(name,data)});
+  }else blobDl(name,data);
+});
+function blobDl(name,data){
+  try{
+    var u=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+    var a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();
+    document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},1500);
+    jmsg("Saved");
+  }catch(e){jmsg("Download blocked here — use Copy instead")}
+}
+document.getElementById("jImport").addEventListener("click",function(){
+  var raw=document.getElementById("jBox").value.trim();
+  if(!raw){jmsg("Nothing in the box");return}
+  var p=null;
+  try{p=JSON.parse(raw)}catch(e){jmsg("Not valid JSON");return}
+  if(!p||typeof p!=="object"||!p.days||typeof p.days!=="object"){
+    jmsg("No ledger data in that JSON");return}
+  var before=Object.keys(LG.days).length;
+  merge(p);
+  persist();all();
+  jmsg("Merged · "+before+" → "+Object.keys(LG.days).length+" days");
+});
 
 function rLevel(){
   var L=levelInfo(), R=L.R;
@@ -689,6 +829,8 @@ document.getElementById("prev").addEventListener("click",function(){if(dif(S,cur
 document.getElementById("next").addEventListener("click",function(){if(cur<E){cur=addD(cur,1);all()}});
 document.getElementById("today").addEventListener("click",function(){cur=todayC();all()});
 
+LG=readLocal()||blank();
+if(migrate())writeLocal();
 cur=todayC();
 all();
 
@@ -699,12 +841,13 @@ all();
     DB=d;
     document.getElementById("sync").classList.add("live");
     document.getElementById("syncText").textContent="Synced · laptop and phone";
-    DB.doc("state/cp").get().then(function(s){if(s.exists){ST.cp=s.data();lsS("state/cp",ST.cp)}})
-      ["catch"](function(){});
-    DB.collection("log").limit(1000).get().then(function(q){
-      for(var i=0;i<q.docs.length;i++){var dd=q.docs[i];ALL[dd.id]=dd.data();lsS("log/"+dd.id,ALL[dd.id])}
-      all();
-    })["catch"](function(){});
+    // Pull the shared blob, merge it under the local one, and keep watching it.
+    DB.doc(DPATH).onSnapshot(function(s){
+      if(!s.exists)return;
+      if(merge(s.data())){writeLocal();all()}
+    },function(){});
+    // Fold anything already held only on this device up to the server.
+    if(Object.keys(LG.days).length||Object.keys(LG.cp).length)persist();
   })["catch"](function(){});
 })();
 </script>

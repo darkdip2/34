@@ -185,6 +185,8 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
 .status{display:flex;align-items:center;gap:6px}
 .status i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
 .status.live i{background:var(--good)}
+.status.bad i{background:var(--bad)}
+.status.bad span{color:var(--bad)}
 @media (max-width:600px){
   .lvlbig .n{font-size:48px}
   .srow{grid-template-columns:104px 1fr 58px}
@@ -361,7 +363,11 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
 </section>
 
 <div class="foot">
-  <div class="status" id="sync"><i></i><span id="syncText">Saving to this device</span></div>
+  <div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap">
+    <div class="status" id="sync"><i></i><span id="syncText">Checking store…</span></div>
+    <button class="btn" id="syncNow" style="padding:4px 9px;font-size:11.5px">Sync now</button>
+  </div>
+  <div id="syncWhy" style="margin-top:5px;color:var(--ink-3)"></div>
   <div style="margin-top:6px">13 Sep 2026 &rarr; 26 Oct 2027</div>
 </div>
 </div>
@@ -495,19 +501,45 @@ function touch(k){
 }
 function stG(){return LG.cp}
 
+/* Sync state is reported honestly, because "not syncing" has two very
+   different causes and the fix differs: either this deployment has no store
+   behind it at all, or it has one and the write failed. */
+var SYNC={state:"checking",at:null};
+function setSync(state,at){
+  SYNC.state=state; if(at)SYNC.at=at;
+  var el=document.getElementById("sync"), tx=document.getElementById("syncText"),
+      why=document.getElementById("syncWhy");
+  if(!el)return;
+  el.className="status"+(state==="synced"?" live":"")+(state==="error"?" bad":"");
+  var stamp=SYNC.at?(" · "+pad(SYNC.at.getHours())+":"+pad(SYNC.at.getMinutes())):"";
+  if(state==="synced"){tx.textContent="Cloud store"+(SYNC.at?" · saved"+stamp:" · connected");
+    why.textContent="Your ledger is on the server. Any device signed in as you sees the same data.";}
+  else if(state==="saving"){tx.textContent="Saving to cloud…"; why.textContent="";}
+  else if(state==="error"){tx.textContent="Cloud write failed";
+    why.textContent="Held on this device and will retry. Copy the JSON from the Storage tab if you need it safe now.";}
+  else if(state==="none"){tx.textContent="No cloud store on this deployment";
+    why.textContent="This copy is served as plain static files, so there is no server to save to. Data stays in this browser only. The claude.ai copy has the store.";}
+  else if(state==="blocked"){tx.textContent="Cloud store unavailable";
+    why.textContent="This page can reach a host but the store did not load. Data is held on this device meanwhile.";}
+  else {tx.textContent="Checking store…"; why.textContent="";}
+}
+
+function pushRemote(){
+  if(!DB)return;
+  setSync("saving");
+  try{
+    DB.doc(DPATH).get().then(function(s){
+      if(s.exists)merge(s.data());          // never clobber another device's edit
+      return DB.doc(DPATH).set(LG);
+    }).then(function(){setSync("synced",new Date())},
+            function(){setSync("error")});
+  }catch(e){setSync("error")}
+}
 function persist(){
-  writeLocal();
+  writeLocal();                              // offline cache, not the source of truth
   if(!DB)return;
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(function(){
-    // re-read before writing so a change made on another device is not clobbered
-    try{
-      DB.doc(DPATH).get().then(function(s){
-        if(s.exists)merge(s.data());
-        return DB.doc(DPATH).set(LG);
-      })["catch"](function(){});
-    }catch(e){}
-  },600);
+  saveTimer=setTimeout(pushRemote,600);
 }
 function saveDay(k){touch(k);persist()}
 function stS(){persist()}
@@ -813,20 +845,27 @@ if(migrate())writeLocal();
 cur=todayC();
 all();
 
+document.getElementById("syncNow").addEventListener("click",function(){
+  if(DB)pushRemote(); else setSync(window.claude?"blocked":"none");
+});
+
 (function(){
-  if(!window.claude||typeof window.claude.use!=="function")return;
+  if(!window.claude||typeof window.claude.use!=="function"){setSync("none");return}
+  setSync("checking");
+  var settled=false;
+  setTimeout(function(){if(!settled)setSync("blocked")},11000);
   window.claude.use("db").then(function(d){
-    if(!d)return;
+    settled=true;
+    if(!d){setSync("blocked");return}
     DB=d;
-    document.getElementById("sync").classList.add("live");
-    document.getElementById("syncText").textContent="Synced · laptop and phone";
+    setSync("synced");
     // Pull the shared blob, merge it under the local one, and keep watching it.
     DB.doc(DPATH).onSnapshot(function(s){
-      if(!s.exists)return;
-      if(merge(s.data())){writeLocal();all()}
-    },function(){});
-    // Fold anything already held only on this device up to the server.
-    if(Object.keys(LG.days).length||Object.keys(LG.cp).length)persist();
-  })["catch"](function(){});
+      if(s.exists&&merge(s.data())){writeLocal();all()}
+      setSync("synced",new Date());
+    },function(){setSync("error")});
+    // Fold anything held only on this device up to the server.
+    if(Object.keys(LG.days).length||Object.keys(LG.cp).length)pushRemote();
+  },function(){settled=true;setSync("blocked")});
 })();
 </script>

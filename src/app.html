@@ -510,9 +510,9 @@ function stG(){return LG.cp}
 /* Sync state is reported honestly, because "not syncing" has two very
    different causes and the fix differs: either this deployment has no store
    behind it at all, or it has one and the write failed. */
-var SYNC={state:"checking",at:null};
-function setSync(state,at){
-  SYNC.state=state; if(at)SYNC.at=at;
+var SYNC={state:"checking",at:null,detail:""};
+function setSync(state,at,detail){
+  SYNC.state=state; if(at)SYNC.at=at; SYNC.detail=detail||"";
   var el=document.getElementById("sync"), tx=document.getElementById("syncText"),
       why=document.getElementById("syncWhy");
   if(!el)return;
@@ -522,7 +522,8 @@ function setSync(state,at){
     why.textContent="Your ledger is on the server. Any device signed in as you sees the same data.";}
   else if(state==="saving"){tx.textContent="Saving to cloud…"; why.textContent="";}
   else if(state==="error"){tx.textContent="Cloud write failed";
-    why.textContent="Held on this device and will retry. Copy the JSON from the Storage tab if you need it safe now.";}
+    why.textContent=(SYNC.detail?SYNC.detail+" — ":"")+
+      "Held on this device and will retry. Copy the JSON from the Storage tab if you need it safe now.";}
   else if(state==="needkey"){tx.textContent="Access key needed";
     why.textContent="This server holds your ledger but will not open it without the key. Render generated it — Dashboard → your service → Environment → LEDGER_KEY.";}
   else if(state==="none"){tx.textContent="No cloud store on this deployment";
@@ -547,9 +548,20 @@ function apiFetch(method,body){
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey()},
     body:body?JSON.stringify(body):undefined
   }).then(function(r){
-    if(r.status===401){var e=new Error("bad_key");e.code=401;throw e}
-    if(!r.ok){var x=new Error("http_"+r.status);x.code=r.status;throw x}
-    return r.json();
+    if(r.ok)return r.json();
+    // Carry the server's own explanation up to the footer. A bare "failed"
+    // leaves you guessing between a missing key, a missing database and a
+    // region mismatch, which are three different fixes.
+    return r.json()["catch"](function(){return {}}).then(function(j){
+      var e=new Error(j.error||("http_"+r.status));
+      e.code=r.status;
+      e.detail=(j.message||j.error||("HTTP "+r.status))+" (HTTP "+r.status+")";
+      throw e;
+    });
+  },function(){
+    var e=new Error("unreachable");e.code=0;
+    e.detail="Could not reach the server at all — it may be asleep or still deploying.";
+    throw e;
   });
 }
 
@@ -571,7 +583,7 @@ function pushRemote(){
     apiFetch("PUT",LG).then(function(r){
       if(r&&r.doc&&merge(r.doc)){writeLocal();all()}
       setSync("synced",new Date());
-    },function(e){setSync(e.code===401?"needkey":"error")});
+    },function(e){setSync(e.code===401?"needkey":"error",null,e.detail)});
     return;
   }
 }
@@ -580,7 +592,7 @@ function pullRemote(){
   apiFetch("GET").then(function(r){
     if(r&&r.doc&&merge(r.doc)){writeLocal();all()}
     setSync("synced",r&&r.updatedAt?new Date(r.updatedAt):new Date());
-  },function(e){setSync(e.code===401?"needkey":"error")});
+  },function(e){setSync(e.code===401?"needkey":"error",null,e.detail)});
 }
 function persist(){
   writeLocal();                              // offline cache, not the source of truth

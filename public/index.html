@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#F4F5F2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1519" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Matchday 2027">
+<meta name="apple-mobile-web-app-title" content="Investiture Ledger">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
 <style>
 /* Baseline the Artifact runtime supplies; the static build must match it. */
@@ -19,7 +19,7 @@ img{max-width:100%}
 </style>
 </head>
 <body>
-<title>Matchday 2027</title>
+<title>Investiture Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -28,913 +28,684 @@ img{max-width:100%}
   --paper:#F4F5F2; --panel:#FFFFFF; --panel-2:#EDEFEA;
   --ink:#12171A; --ink-2:#414C53; --ink-3:#77858D;
   --rule:#DBE0DA; --rule-2:#C8CFC7;
-  --accent:#1D4A7A; --accent-ink:#FFFFFF; --accent-soft:#E6EEF6;
-  --i-rest:#77948A; --i-low:#5584AE; --i-mod:#B8842A; --i-high:#A33A2C;
-  --good:#2C7A57; --warn:#9C6612;
-  --shadow:0 1px 2px rgba(18,23,26,.06), 0 6px 18px rgba(18,23,26,.05);
+  --accent:#1D4A7A; --accent-ink:#FFF; --accent-soft:#E6EEF6;
+  --good:#2C7A57; --good-soft:#E2F0E9; --warn:#9C6612; --warn-soft:#F7EEDC;
+  --bad:#A33A2C; --bad-soft:#F6E5E2;
+  --m1:#1D4A7A; --m2:#2C7A57; --m3:#B8842A; --m4:#6E5A9C;
+  --shadow:0 1px 2px rgba(18,23,26,.06),0 6px 18px rgba(18,23,26,.05);
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
   --sans:"Archivo",-apple-system,"Segoe UI",system-ui,sans-serif;
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --paper:#0F1519; --panel:#182025; --panel-2:#1E272D;
-    --ink:#E9EEF0; --ink-2:#A6B4BC; --ink-3:#73838C;
-    --rule:#28333A; --rule-2:#354249;
-    --accent:#74AFE4; --accent-ink:#0F1519; --accent-soft:#1A2A38;
-    --i-rest:#8DA99B; --i-low:#79A7D0; --i-mod:#D5A249; --i-high:#D0614F;
-    --good:#52B589; --warn:#D5A249;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.3);
-  }
-}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0F1519; --panel:#182025; --panel-2:#1E272D;
+  --ink:#E9EEF0; --ink-2:#A6B4BC; --ink-3:#73838C;
+  --rule:#28333A; --rule-2:#354249;
+  --accent:#74AFE4; --accent-ink:#0F1519; --accent-soft:#1A2A38;
+  --good:#52B589; --good-soft:#163024; --warn:#D5A249; --warn-soft:#312814;
+  --bad:#D0614F; --bad-soft:#33201C;
+  --m1:#74AFE4; --m2:#52B589; --m3:#D5A249; --m4:#A48BD4;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+}}
 :root[data-theme="dark"]{
   --paper:#0F1519; --panel:#182025; --panel-2:#1E272D;
   --ink:#E9EEF0; --ink-2:#A6B4BC; --ink-3:#73838C;
   --rule:#28333A; --rule-2:#354249;
   --accent:#74AFE4; --accent-ink:#0F1519; --accent-soft:#1A2A38;
-  --i-rest:#8DA99B; --i-low:#79A7D0; --i-mod:#D5A249; --i-high:#D0614F;
-  --good:#52B589; --warn:#D5A249;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.3);
+  --good:#52B589; --good-soft:#163024; --warn:#D5A249; --warn-soft:#312814;
+  --bad:#D0614F; --bad-soft:#33201C;
+  --m1:#74AFE4; --m2:#52B589; --m3:#D5A249; --m4:#A48BD4;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);
-  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px 60px}
-h1,h2,h3{text-wrap:balance;margin:0}
-.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  font-weight:600;color:var(--ink-3)}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px 64px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:600 10.5px var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
 
-header.top{border-bottom:1px solid var(--rule);background:var(--panel)}
-.top-in{max-width:1120px;margin:0 auto;padding:15px 20px;
-  display:flex;align-items:center;gap:22px;flex-wrap:wrap}
-.brand{display:flex;flex-direction:column;gap:3px;margin-right:auto}
-.brand .t{font-size:17px;font-weight:800;letter-spacing:-.02em}
-.brand .s{font-size:11.5px;color:var(--ink-3);font-family:var(--mono)}
-.countdown{display:flex;gap:24px;align-items:baseline}
-.cd b{display:block;font-family:var(--mono);font-size:26px;font-weight:600;
-  line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.cd span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--ink-3);font-weight:600}
-.cd.hot b{color:var(--accent)}
+header.top{background:var(--panel);border-bottom:1px solid var(--rule)}
+.top-in{max-width:880px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.lvl-badge{display:flex;align-items:baseline;gap:7px;margin-right:auto}
+.lvl-badge b{font:800 25px var(--mono);letter-spacing:-.02em;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.lvl-badge span{font:600 10.5px var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.hstat{display:flex;flex-direction:column;gap:1px}
+.hstat b{font:600 17px var(--mono);line-height:1.15;font-variant-numeric:tabular-nums}
+.hstat span{font:600 9.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.hstat.fire b{color:var(--warn)}
+.hstat.debt b{color:var(--bad)}
 
-nav.tabs{border-bottom:1px solid var(--rule);background:var(--panel);
-  position:sticky;top:0;z-index:19;overflow-x:auto}
-.tabs-in{max-width:1120px;margin:0 auto;padding:0 14px;display:flex;gap:2px}
-.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;
-  padding:11px 13px;font:600 13.5px var(--sans);color:var(--ink-3);cursor:pointer;
-  white-space:nowrap}
+nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:19;overflow-x:auto}
+.tabs-in{max-width:880px;margin:0 auto;padding:0 12px;display:flex;gap:2px}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;padding:11px 13px;
+  font:600 13.5px var(--sans);color:var(--ink-3);cursor:pointer;white-space:nowrap}
 .tab:hover{color:var(--ink-2)}
 .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:3px}
 
-.panel{background:var(--panel);border:1px solid var(--rule);border-radius:6px;
-  box-shadow:var(--shadow)}
-.sec{margin-top:26px}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:7px;box-shadow:var(--shadow)}
+.pad{padding:16px 18px}
+.sec{margin-top:22px}
 .sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.sec-h h2{font-size:15px;font-weight:700;letter-spacing:-.01em}
-.sec-h .note{font-size:12px;color:var(--ink-3);margin-left:auto;font-family:var(--mono)}
+.sec-h h2{font-size:15px;font-weight:700}
+.sec-h .note{margin-left:auto;font:500 12px var(--mono);color:var(--ink-3)}
+.lede{font-size:13.5px;color:var(--ink-2);max-width:64ch;line-height:1.6;margin:0}
 
-.daybar{display:flex;align-items:center;gap:11px;flex-wrap:wrap;
-  padding:14px 16px;border:1px solid var(--rule);border-radius:6px;
-  background:var(--panel);box-shadow:var(--shadow);margin-top:22px}
-.daybar .dow{font-size:20px;font-weight:800;letter-spacing:-.02em}
-.daybar .date{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
-.chip{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;
-  padding:3px 8px;border-radius:3px;border:1px solid var(--rule-2);color:var(--ink-2);
-  background:var(--panel-2);white-space:nowrap}
+.track{height:6px;background:var(--panel-2);border-radius:4px;overflow:hidden}
+.track>i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .3s ease}
+.track.ok>i{background:var(--good)} .track.no>i{background:var(--bad)}
+
+/* daily */
+.daybar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.daybar .dow{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.daybar .dt{font:500 13px var(--mono);color:var(--ink-2)}
+.chip{font:600 10.5px var(--mono);letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;
+  border-radius:3px;border:1px solid var(--rule-2);color:var(--ink-2);background:var(--panel-2)}
 .chip.md{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.chip.plain{text-transform:none;letter-spacing:.01em;font-family:var(--sans);font-size:11.5px}
 .btn{appearance:none;font:600 12.5px var(--sans);padding:7px 12px;border-radius:5px;
   border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
 .btn:hover{border-color:var(--ink-3);color:var(--ink)}
 .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.navbtns{display:flex;gap:6px;margin-left:auto}
+.btn.card{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.btn.card.on{background:var(--warn);color:#fff;border-color:var(--warn)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.navb{display:flex;gap:6px;margin-left:auto}
 
-.ruler{margin-top:14px;border:1px solid var(--rule);border-radius:6px;
-  background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
-.slot{display:grid;grid-template-columns:76px 5px 1fr 44px;align-items:stretch;
-  border-top:1px solid var(--rule)}
-.slot:first-child{border-top:0}
-.slot.gap{background:repeating-linear-gradient(135deg,transparent 0 7px,var(--panel-2) 7px 14px)}
-.slot-time{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
-  padding:12px 0 12px 14px;font-variant-numeric:tabular-nums;line-height:1.35}
-.slot-bar{width:5px}
-.slot-body{padding:11px 12px;min-width:0}
-.slot-title{font-weight:600;font-size:14px;letter-spacing:-.005em}
-.slot-detail{font-size:12.5px;color:var(--ink-2);margin-top:2px}
-.slot-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center}
-.tag{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;
-  padding:2px 6px;border-radius:3px;color:#fff;white-space:nowrap}
-.dur{font:500 11px var(--mono);color:var(--ink-3)}
-.slot-check{display:flex;align-items:center;justify-content:center;
-  border-left:1px solid var(--rule)}
-.slot-check input{width:19px;height:19px;accent-color:var(--accent);cursor:pointer}
-.slot.done .slot-title{color:var(--ink-3);text-decoration:line-through}
-.slot.done .slot-detail{color:var(--ink-3)}
-.slot.done{background:var(--panel-2)}
-.slot.gap .slot-title{font-weight:600;font-size:12.5px;color:var(--ink-2)}
+.verdict{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:7px;
+  border:1px solid var(--rule);margin-top:14px;flex-wrap:wrap}
+.verdict.pass{background:var(--good-soft);border-color:var(--good)}
+.verdict.fail{background:var(--bad-soft);border-color:var(--bad)}
+.verdict.open{background:var(--panel-2)}
+.verdict .mark{font:800 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;
+  border-radius:4px;color:#fff;background:var(--ink-3);white-space:nowrap}
+.verdict.pass .mark{background:var(--good)} .verdict.fail .mark{background:var(--bad)}
+.verdict .msg{font-size:13.5px;color:var(--ink-2);flex:1;min-width:180px}
+.verdict .msg b{color:var(--ink)}
 
-.capture{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
-  gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;
-  overflow:hidden;margin-top:14px}
-.cap{background:var(--panel);padding:11px 13px;display:flex;flex-direction:column;gap:5px}
-.cap label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  font-weight:600;color:var(--ink-3)}
-.cap input,.cap select,.cap textarea{font-family:var(--mono);font-size:14px;
-  background:transparent;border:0;border-bottom:1px solid var(--rule-2);
-  color:var(--ink);padding:3px 0;width:100%}
-.cap input:focus,.cap select:focus,.cap textarea:focus{outline:none;border-bottom-color:var(--accent)}
-.cap.notes{grid-column:1/-1}
-.cap textarea{resize:vertical;min-height:44px;line-height:1.45;
-  font-family:var(--sans);font-size:13.5px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+.met{background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:7px}
+.met .lab{display:flex;align-items:center;gap:6px}
+.met .lab i{width:9px;height:9px;border-radius:2px;flex:0 0 9px}
+.met .lab span{font:600 11px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+.met input{font:600 22px var(--mono);background:transparent;border:0;border-bottom:1px solid var(--rule-2);
+  color:var(--ink);padding:2px 0;width:100%;font-variant-numeric:tabular-nums}
+.met input:focus{outline:none;border-bottom-color:var(--accent)}
+.met .hint{font:500 10.5px var(--mono);color:var(--ink-3)}
 
-.track{height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden}
-.track > i{display:block;height:100%;background:var(--accent);border-radius:3px;
-  transition:width .25s ease}
+.fblist{border:1px solid var(--rule);border-radius:7px;overflow:hidden;background:var(--panel)}
+.fbrow{display:grid;grid-template-columns:1fr 62px 44px;align-items:center;gap:10px;
+  padding:12px 14px;border-top:1px solid var(--rule)}
+.fbrow:first-child{border-top:0}
+.fbrow.done{background:var(--panel-2)}
+.fbrow.done .t{color:var(--ink-3);text-decoration:line-through}
+.fbrow .t{font-weight:600;font-size:13.5px}
+.fbrow .m{font:500 11.5px var(--mono);color:var(--ink-3);text-align:right}
+.fbrow input{width:19px;height:19px;accent-color:var(--accent);cursor:pointer;justify-self:center}
 
-.tbl-wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;
-  background:var(--panel);box-shadow:var(--shadow)}
-table{border-collapse:collapse;width:100%;min-width:540px}
-th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
-  color:var(--ink-3);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--rule);
-  white-space:nowrap;background:var(--panel-2)}
-td{padding:11px 14px;border-bottom:1px solid var(--rule);font-size:13.5px;vertical-align:top}
-tr:last-child td{border-bottom:0}
-td.n,th.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-input.inline{font-family:var(--mono);font-size:13.5px;width:90px;background:transparent;
-  border:0;border-bottom:1px dashed var(--rule-2);color:var(--ink);padding:1px 0}
-input.inline:focus{outline:none;border-bottom-style:solid;border-bottom-color:var(--accent)}
-td .bar{margin-top:7px}
+/* checkpoints */
+.goal{display:flex;flex-direction:column;gap:11px;padding:18px;border-radius:7px;
+  background:var(--accent-soft);border:1px solid var(--accent)}
+.goal .k{font:600 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.goal h2{font-size:21px;font-weight:800;letter-spacing:-.02em}
+.goal .d{font:500 12.5px var(--mono);color:var(--ink-2)}
+.cpgroup{margin-top:18px}
+.cpgroup .gh{display:flex;align-items:baseline;gap:9px;margin-bottom:8px}
+.cpgroup .gh h3{font-size:13px;font-weight:700;letter-spacing:.02em}
+.cpgroup .gh .c{font:500 11.5px var(--mono);color:var(--ink-3);margin-left:auto}
+.cplist{border:1px solid var(--rule);border-radius:7px;overflow:hidden;background:var(--panel)}
+.cprow{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:10px;
+  padding:12px 14px;border-top:1px solid var(--rule)}
+.cprow:first-child{border-top:0}
+.cprow input{width:18px;height:18px;accent-color:var(--good);cursor:pointer;justify-self:center}
+.cprow .t{font-weight:600;font-size:13.5px}
+.cprow .s{font-size:12px;color:var(--ink-3);margin-top:1px}
+.cprow.done{background:var(--good-soft)}
+.cprow.done .t{color:var(--ink-3);text-decoration:line-through}
+.cprow .due{font:500 11px var(--mono);color:var(--ink-3);white-space:nowrap}
+.cprow.late .due{color:var(--bad);font-weight:600}
 
-.mc-wrap{overflow-x:auto;border-radius:6px}
-.mc{display:grid;grid-template-columns:repeat(7,minmax(134px,1fr));gap:1px;
-  background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden;
-  min-width:960px}
-.mc-col{background:var(--panel);display:flex;flex-direction:column}
-.mc-h{padding:9px 11px;border-bottom:1px solid var(--rule);background:var(--panel-2)}
-.mc-h .d{font-weight:700;font-size:13px}
-.mc-h .m{font:600 10px var(--mono);letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
-.mc-h.today{background:var(--accent-soft)}
-.mc-h.today .d{color:var(--accent)}
-.mc-sess{padding:8px 11px;border-bottom:1px solid var(--rule);font-size:11.5px;
-  display:flex;gap:7px;align-items:stretch;line-height:1.4}
-.mc-sess:last-child{border-bottom:0}
-.mc-sess .dot{width:3px;border-radius:2px;flex:0 0 3px}
-.mc-part{padding:5px 11px;font:600 9.5px var(--mono);letter-spacing:.1em;
-  text-transform:uppercase;color:var(--ink-3);background:var(--panel-2);
-  border-bottom:1px solid var(--rule)}
+/* storage */
+.bigstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+.bs{background:var(--panel);padding:15px 16px;display:flex;flex-direction:column;gap:4px}
+.bs b{font:600 27px var(--mono);letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.bs span{font:600 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.bs small{font:500 11px var(--mono);color:var(--ink-3)}
+.split{display:flex;flex-direction:column;gap:11px}
+.srow{display:grid;grid-template-columns:132px 1fr 66px;align-items:center;gap:11px}
+.srow .l{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.srow .l i{width:9px;height:9px;border-radius:2px;flex:0 0 9px}
+.srow .v{font:600 12.5px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.chart{display:flex;align-items:flex-end;gap:2px;height:76px;padding-top:4px}
+.chart .c{flex:1;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.chart .c i{display:block;background:var(--accent);border-radius:1.5px;min-height:1px}
+.chart .c i.tech{background:var(--m1)} .chart .c i.fb{background:var(--m2);border-radius:1.5px 1.5px 0 0}
 
-.blocks{display:flex;flex-direction:column;gap:1px;background:var(--rule);
-  border:1px solid var(--rule);border-radius:6px;overflow:hidden;box-shadow:var(--shadow)}
-.blk{background:var(--panel);padding:16px 18px;display:grid;
-  grid-template-columns:minmax(160px,210px) 1fr;gap:20px}
-.blk.now{background:var(--accent-soft)}
-.blk-l{display:flex;flex-direction:column;gap:4px}
-.blk-l .wk{font:600 11px var(--mono);letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
-.blk-l h3{font-size:16px;font-weight:700;letter-spacing:-.015em}
-.blk-l .dt{font-family:var(--mono);font-size:11.5px;color:var(--ink-2)}
-.blk-l .st{font:600 10px var(--mono);letter-spacing:.09em;text-transform:uppercase;
-  color:var(--accent);margin-top:3px}
-.blk-r .obj{font-size:13.5px;margin:0 0 9px;color:var(--ink)}
-.blk-r ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:5px}
-.blk-r li{font-size:13.5px;color:var(--ink-2)}
-.blk-r li b{color:var(--ink);font-weight:600}
-
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;
-  border-bottom:1px solid var(--rule);font-size:13.5px}
+/* level */
+.lvlbig{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.lvlbig .n{font:800 62px var(--mono);line-height:.9;letter-spacing:-.04em;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.lvlbig .meta{flex:1;min-width:200px;display:flex;flex-direction:column;gap:7px}
+.lvlbig .meta .t{font-size:15px;font-weight:700}
+.lvlbig .meta .s{font-size:12.5px;color:var(--ink-2)}
+.drivers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+.drv{display:flex;flex-direction:column;gap:8px}
+.drv .h{display:flex;align-items:baseline;gap:8px}
+.drv .h b{font-size:13px;font-weight:700}
+.drv .h span{margin-left:auto;font:600 12px var(--mono);color:var(--ink-2)}
+.drv .w{font:500 10.5px var(--mono);color:var(--ink-3)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13.5px}
 .kv:last-child{border-bottom:0}
 .kv .k{color:var(--ink-2)}
-.kv .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
-.pad{padding:16px 18px}
-.lede{font-size:14px;color:var(--ink-2);max-width:66ch;line-height:1.62}
-.legend{display:flex;gap:15px;flex-wrap:wrap;align-items:center;margin-top:11px}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
-.legend span{font:600 10.5px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
-.status{font:500 11.5px var(--mono);color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.kv .v{font:500 13.5px var(--mono);font-variant-numeric:tabular-nums}
+.hide{display:none!important}
+.foot{margin-top:32px;padding-top:15px;border-top:1px solid var(--rule);font:500 11.5px var(--mono);
+  color:var(--ink-3);line-height:1.7}
+.status{display:flex;align-items:center;gap:6px}
 .status i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
 .status.live i{background:var(--good)}
-.hide{display:none!important}
-.foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--rule);
-  font-size:12px;color:var(--ink-3);font-family:var(--mono);line-height:1.75}
-.wkstrip{display:flex;gap:5px;margin-top:12px}
-.wkd{flex:1;text-align:center}
-.wkd .bar{height:30px;background:var(--panel-2);border-radius:3px;position:relative;
-  overflow:hidden;display:flex;align-items:flex-end}
-.wkd .bar i{display:block;width:100%;background:var(--accent);transition:height .25s ease}
-.wkd .lb{font:600 9.5px var(--mono);color:var(--ink-3);margin-top:4px;letter-spacing:.06em}
-.wkd.is-today .lb{color:var(--accent)}
-@media (max-width:640px){
-  .blk{grid-template-columns:1fr;gap:11px}
-  .countdown{gap:17px}
-  .cd b{font-size:21px}
-  .brand{width:100%;margin-right:0}
-  .slot{grid-template-columns:62px 4px 1fr 40px}
-  .slot-time{padding-left:10px;font-size:10.5px}
+@media (max-width:600px){
+  .lvlbig .n{font-size:48px}
+  .srow{grid-template-columns:104px 1fr 58px}
+  .top-in{gap:14px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<header class="top">
-  <div class="top-in">
-    <div class="brand">
-      <div class="t">Matchday 2027</div>
-      <div class="s" id="brandSub">Analyst &rarr; professional contract &middot; 13 Sep 2026 &rarr; 26 Oct 2027</div>
-    </div>
-    <div class="countdown">
-      <div class="cd hot"><b id="cdDays">&mdash;</b><span>days left</span></div>
-      <div class="cd"><b id="cdWeeks">&mdash;</b><span>weeks left</span></div>
-      <div class="cd"><b id="cdWeekNo">&mdash;</b><span>week no.</span></div>
-      <div class="cd"><b id="cdBlock">&mdash;</b><span>block</span></div>
-    </div>
-  </div>
-</header>
+<header class="top"><div class="top-in">
+  <div class="lvl-badge"><b id="hLvl">—</b><span>Level</span></div>
+  <div class="hstat fire"><b id="hStreak">—</b><span>Streak</span></div>
+  <div class="hstat"><b id="hRemain">—</b><span>Journey left</span></div>
+  <div class="hstat debt"><b id="hDebt">—</b><span>Debt</span></div>
+</div></header>
 
-<nav class="tabs">
-  <div class="tabs-in" role="tablist">
-    <button class="tab" role="tab" data-view="today" aria-selected="true">Today</button>
-    <button class="tab" role="tab" data-view="week" aria-selected="false">Microcycle</button>
-    <button class="tab" role="tab" data-view="program" aria-selected="false">Programme</button>
-    <button class="tab" role="tab" data-view="bench" aria-selected="false">Benchmarks</button>
-    <button class="tab" role="tab" data-view="health" aria-selected="false">Health</button>
-    <button class="tab" role="tab" data-view="money" aria-selected="false">Money</button>
-  </div>
-</nav>
+<nav class="tabs"><div class="tabs-in" role="tablist">
+  <button class="tab" role="tab" data-v="cp" aria-selected="false">Checkpoints</button>
+  <button class="tab" role="tab" data-v="daily" aria-selected="true">Daily ingestion</button>
+  <button class="tab" role="tab" data-v="store" aria-selected="false">Storage</button>
+  <button class="tab" role="tab" data-v="level" aria-selected="false">Level</button>
+</div></nav>
 
 <div class="wrap">
 
-  <!-- ================= TODAY ================= -->
-  <section id="v-today">
-    <div class="daybar">
-      <span class="dow" id="dDow">&mdash;</span>
-      <span class="date" id="dDate">&mdash;</span>
-      <span class="chip md" id="dMd">&mdash;</span>
-      <span class="chip plain" id="dWeek">&mdash;</span>
-      <span class="chip" id="dLoad">&mdash;</span>
-      <div class="navbtns">
-        <button class="btn" id="prevDay">&larr; Prev</button>
-        <button class="btn" id="todayBtn">Today</button>
-        <button class="btn" id="nextDay">Next &rarr;</button>
-      </div>
+<!-- ============ DAILY ============ -->
+<section id="v-daily">
+  <div class="daybar">
+    <span class="dow" id="dDow">—</span>
+    <span class="dt" id="dDate">—</span>
+    <span class="chip md" id="dMd">—</span>
+    <div class="navb">
+      <button class="btn" id="prev">←</button>
+      <button class="btn" id="today">Today</button>
+      <button class="btn" id="next">→</button>
     </div>
-
-    <div class="sec">
-      <div class="sec-h">
-        <h2>The day, 08:00 to 22:00</h2>
-        <span class="note" id="doneNote">&mdash;</span>
-      </div>
-      <div class="track" style="margin-bottom:12px"><i id="dayBar" style="width:0%"></i></div>
-      <div class="ruler" id="ruler"></div>
-      <div class="legend">
-        <span><i style="background:var(--i-high)"></i>High intensity</span>
-        <span><i style="background:var(--i-mod)"></i>Moderate</span>
-        <span><i style="background:var(--i-low)"></i>Low / aerobic</span>
-        <span><i style="background:var(--i-rest)"></i>Recovery &amp; study</span>
-      </div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-h"><h2>Daily readouts</h2><span class="note">Logged against this date</span></div>
-      <div class="capture">
-        <div class="cap"><label for="cRpe">Session RPE (1&ndash;10)</label>
-          <input id="cRpe" type="number" min="1" max="10" step="1" inputmode="numeric" placeholder="&mdash;"></div>
-        <div class="cap"><label for="cSleep">Sleep (hrs)</label>
-          <input id="cSleep" type="number" min="0" max="14" step="0.5" inputmode="decimal" placeholder="&mdash;"></div>
-        <div class="cap"><label for="cHr">Resting HR (bpm)</label>
-          <input id="cHr" type="number" min="30" max="120" step="1" inputmode="numeric" placeholder="&mdash;"></div>
-        <div class="cap"><label for="cPef">Peak flow (L/min)</label>
-          <input id="cPef" type="number" min="100" max="800" step="5" inputmode="numeric" placeholder="&mdash;"></div>
-        <div class="cap"><label for="cWt">Weight (kg)</label>
-          <input id="cWt" type="number" min="40" max="120" step="0.1" inputmode="decimal" placeholder="&mdash;"></div>
-        <div class="cap"><label for="cMin">Competitive minutes</label>
-          <input id="cMin" type="number" min="0" max="120" step="1" inputmode="numeric" placeholder="0"></div>
-        <div class="cap notes"><label for="cNote">Notes &mdash; what limited you today</label>
-          <textarea id="cNote" placeholder="Breathing, niggles, touch quality, what the coach said."></textarea></div>
-      </div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-h"><h2>This week at a glance</h2><span class="note">Share of the day completed</span></div>
-      <div class="panel pad"><div class="wkstrip" id="wkStrip"></div></div>
-    </div>
-  </section>
-
-  <!-- ================= WEEK ================= -->
-  <section id="v-week" class="hide">
-    <div class="sec">
-      <div class="sec-h"><h2>The standing microcycle</h2><span class="note" id="mcTotal">&mdash;</span></div>
-      <p class="lede">Saturday is matchday. Every other day is named by its distance from it &mdash; the
-        notation pro staff use to schedule load. Intensity falls away as the match approaches and
-        the heaviest gym work sits furthest from it. Job hours, 10:00&ndash;19:00, are the gap in the middle.</p>
-      <div class="mc-wrap" style="margin-top:14px"><div class="mc" id="mcGrid"></div></div>
-      <div class="legend">
-        <span><i style="background:var(--i-high)"></i>High</span>
-        <span><i style="background:var(--i-mod)"></i>Moderate</span>
-        <span><i style="background:var(--i-low)"></i>Low / aerobic</span>
-        <span><i style="background:var(--i-rest)"></i>Recovery &amp; study</span>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="sec-h"><h2>Where the 38 hours go</h2><span class="note">Weekly distribution</span></div>
-      <div class="tbl-wrap"><table><thead><tr>
-        <th>Category</th><th class="n">Hrs / week</th><th>Why it earns the time</th>
-      </tr></thead><tbody id="allocBody"></tbody></table></div>
-    </div>
-  </section>
-
-  <!-- ================= PROGRAMME ================= -->
-  <section id="v-program" class="hide">
-    <div class="sec">
-      <div class="sec-h"><h2>Five blocks to 26 October 2027</h2><span class="note">59 weeks</span></div>
-      <p class="lede">Block dates are set against the Indian football calendar, not round numbers.
-        Club pre-season trials cluster May to July, and the season kicks off in September &mdash;
-        so the exposure block lands in the window where clubs are actually signing.</p>
-      <div class="blocks" id="blockList" style="margin-top:14px"></div>
-    </div>
-  </section>
-
-  <!-- ================= BENCHMARKS ================= -->
-  <section id="v-bench" class="hide">
-    <div class="sec">
-      <div class="sec-h"><h2>Physical standards</h2><span class="note">Type your current number</span></div>
-      <p class="lede">These are entry-level professional outfield markers. Retest the whole battery at the
-        end of every block &mdash; weeks 6, 20, 34, 46 and 58 &mdash; under the same conditions each time,
-        otherwise the numbers mean nothing.</p>
-      <div class="tbl-wrap" style="margin-top:14px"><table><thead><tr>
-        <th>Test</th><th class="n">Current</th><th class="n">Target</th><th>Protocol</th>
-      </tr></thead><tbody id="benchBody"></tbody></table></div>
-    </div>
-  </section>
-
-  <!-- ================= HEALTH ================= -->
-  <section id="v-health" class="hide">
-    <div class="sec">
-      <div class="sec-h"><h2>Medical critical path</h2><span class="note" id="healthNote">&mdash;</span></div>
-      <p class="lede">Two items gate training load rather than sit beside it. The breathing workup sets
-        how much conditioning can honestly be prescribed, so it runs in week 1. Refractive surgery needs a
-        no-contact recovery window, and weeks 1&ndash;6 are the only non-contact stretch in the whole
-        programme &mdash; after February you are in continuous match play.</p>
-      <div class="tbl-wrap" style="margin-top:14px"><table><thead><tr>
-        <th style="width:38px"></th><th>Item</th><th class="n">Due by</th><th>What it unlocks</th>
-      </tr></thead><tbody id="healthBody"></tbody></table></div>
-    </div>
-  </section>
-
-  <!-- ================= MONEY ================= -->
-  <section id="v-money" class="hide">
-    <div class="sec">
-      <div class="sec-h"><h2>What the programme costs you</h2><span class="note">To 26 Oct 2027</span></div>
-      <p class="lede">Self-funded, as you asked. The figures below are what the 59 weeks demand from your own
-        income &mdash; the family loan repaid, the medical work covered, and the running cost of a
-        semi-professional setup carried monthly.</p>
-      <div class="tbl-wrap" style="margin-top:14px"><table><thead><tr>
-        <th>Line</th><th class="n">Amount</th><th class="n">Paid / saved</th><th>Note</th>
-      </tr></thead><tbody id="moneyBody"></tbody></table></div>
-    </div>
-    <div class="sec">
-      <div class="sec-h"><h2>The income question</h2></div>
-      <div class="grid2">
-        <div class="panel pad">
-          <div class="eyebrow" style="margin-bottom:9px">On &#8377;13 LPA today</div>
-          <div class="kv"><span class="k">In-hand, monthly</span><span class="v">&#8377;90,000</span></div>
-          <div class="kv"><span class="k">Living costs</span><span class="v">&minus;&#8377;45,000</span></div>
-          <div class="kv"><span class="k">Athlete nutrition delta</span><span class="v">&minus;&#8377;10,000</span></div>
-          <div class="kv"><span class="k">Coaching, club, physio, kit</span><span class="v">&minus;&#8377;24,000</span></div>
-          <div class="kv"><span class="k"><b>Surplus</b></span><span class="v" style="color:var(--warn)"><b>&#8377;11,000</b></span></div>
-          <p class="lede" style="font-size:13px;margin-top:11px">Funds the training. Funds nothing else &mdash;
-            not the surgery, not the loan, not trial travel.</p>
-        </div>
-        <div class="panel pad">
-          <div class="eyebrow" style="margin-bottom:9px">Target &mdash; remote, &#8377;22&ndash;26 LPA</div>
-          <div class="kv"><span class="k">In-hand, monthly</span><span class="v">&#8377;1,60,000</span></div>
-          <div class="kv"><span class="k">Same outgoings</span><span class="v">&minus;&#8377;79,000</span></div>
-          <div class="kv"><span class="k"><b>Surplus</b></span><span class="v" style="color:var(--good)"><b>&#8377;81,000</b></span></div>
-          <div class="kv"><span class="k">Clears the &#8377;8.55L requirement in</span><span class="v">11 months</span></div>
-          <p class="lede" style="font-size:13px;margin-top:11px">Senior analyst or analytics engineer, remote.
-            Roughly a year of evening-weight effort &mdash; dbt, SQL depth, one warehouse, a portfolio.
-            Remote is the real prize: it returns the 10:00 and 19:00 edges of the day to training.</p>
-        </div>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="sec-h"><h2>What not to do</h2></div>
-      <div class="panel pad">
-        <p class="lede" style="margin:0">Do not take a 12&ndash;18 month re-skill &mdash; an SDE pivot, a heavy
-          certification track. Rupees you can earn back; the training hours and the recovery you spend at 26 you
-          cannot. A higher-paying job with worse hours is a net loss against the October 2027 date, however good
-          the offer looks. Optimise the job for schedule control first, salary second.</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="foot">
-    <div class="status" id="syncStatus"><i></i><span id="syncText">Saving to this device</span></div>
-    <div style="margin-top:7px">Programme start 13 Sep 2026 &middot; Checkpoint 26 Oct 2027 &middot;
-      Ticks, readouts and figures sync across your laptop and phone.</div>
   </div>
+
+  <div class="verdict open" id="verdict">
+    <span class="mark" id="vMark">—</span>
+    <span class="msg" id="vMsg">—</span>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Technical</h2><span class="note" id="tNote">—</span></div>
+    <div class="track" style="margin-bottom:11px"><i id="tBar" style="width:0%"></i></div>
+    <div class="metrics" id="metrics"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Football</h2><span class="note" id="fNote">—</span></div>
+    <div class="track" style="margin-bottom:11px"><i id="fBar" style="width:0%"></i></div>
+    <div class="fblist" id="fblist"></div>
+    <div style="display:flex;align-items:center;gap:11px;margin-top:11px;flex-wrap:wrap">
+      <button class="btn card" id="cardBtn">Use break card</button>
+      <span class="mono" style="font-size:11.5px;color:var(--ink-3)" id="cardNote">—</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECKPOINTS ============ -->
+<section id="v-cp" class="hide">
+  <div class="goal" style="margin-top:20px">
+    <span class="k">Current checkpoint</span>
+    <h2>Signed at a professional club</h2>
+    <div class="d" id="goalDt">—</div>
+    <div class="track" style="background:rgba(0,0,0,.08)"><i id="goalBar" style="width:0%"></i></div>
+    <div class="d" id="goalPct">—</div>
+  </div>
+  <div id="cpGroups"></div>
+</section>
+
+<!-- ============ STORAGE ============ -->
+<section id="v-store" class="hide">
+  <div class="sec" style="margin-top:20px">
+    <div class="bigstat">
+      <div class="bs"><b id="sTotal">—</b><span>Total stored</span><small>hours of investiture</small></div>
+      <div class="bs"><b id="sTech">—</b><span>Technical</span><small id="sTechD">—</small></div>
+      <div class="bs"><b id="sFb">—</b><span>Football</span><small id="sFbD">—</small></div>
+      <div class="bs"><b id="sDays">—</b><span>Days logged</span><small id="sDaysD">—</small></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Technical composition</h2><span class="note">Cumulative hours</span></div>
+    <div class="panel pad"><div class="split" id="composition"></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Last 30 days</h2><span class="note">Technical over football</span></div>
+    <div class="panel pad">
+      <div class="chart" id="chart"></div>
+      <div style="display:flex;gap:15px;margin-top:11px">
+        <span class="mono" style="font-size:10.5px;color:var(--ink-3)">
+          <i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--m1)"></i> TECHNICAL</span>
+        <span class="mono" style="font-size:10.5px;color:var(--ink-3)">
+          <i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--m2)"></i> FOOTBALL</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Debt</h2><span class="note">Shortfall owed back</span></div>
+    <div class="panel pad">
+      <div class="kv"><span class="k">Outstanding</span><span class="v" id="dOut">—</span></div>
+      <div class="kv"><span class="k">How it clears</span><span class="v" id="dClear">—</span></div>
+      <p class="lede" style="margin-top:11px">Every hour you fall short of the day's requirement is added here at
+        1&times;. Hours logged beyond the requirement pay it down. Levels are frozen while any debt stands.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEVEL ============ -->
+<section id="v-level" class="hide">
+  <div class="sec" style="margin-top:20px"><div class="panel pad">
+    <div class="lvlbig">
+      <div class="n" id="lNum">—</div>
+      <div class="meta">
+        <div class="t" id="lTitle">—</div>
+        <div class="track"><i id="lBar" style="width:0%"></i></div>
+        <div class="s" id="lSub">—</div>
+      </div>
+    </div>
+    <div class="drivers">
+      <div class="drv">
+        <div class="h"><b>Checkpoints cleared</b><span id="dvCp">—</span></div>
+        <div class="track ok"><i id="dvCpBar" style="width:0%"></i></div>
+        <div class="w">Weighted 60% of level progress</div>
+      </div>
+      <div class="drv">
+        <div class="h"><b>Best streak</b><span id="dvSt">—</span></div>
+        <div class="track"><i id="dvStBar" style="width:0%"></i></div>
+        <div class="w">Weighted 40%, measured against 365 days</div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Standing</h2></div>
+    <div class="panel pad">
+      <div class="kv"><span class="k">Current streak</span><span class="v" id="stNow">—</span></div>
+      <div class="kv"><span class="k">Best streak</span><span class="v" id="stBest">—</span></div>
+      <div class="kv"><span class="k">Break cards left this month</span><span class="v" id="stCards">—</span></div>
+      <div class="kv"><span class="k">Debt outstanding</span><span class="v" id="stDebt">—</span></div>
+      <div class="kv"><span class="k">Days to checkpoint</span><span class="v" id="stDays">—</span></div>
+      <div class="kv"><span class="k">Journey remaining</span><span class="v" id="stRem">—</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>What levels you</h2></div>
+    <div class="panel pad"><p class="lede" style="margin:0">Progress is uniform across 20 levels.
+      Sixty percent comes from clearing checkpoints, forty from your best streak measured against a full year.
+      Time alone moves nothing &mdash; a day logged is only a day held. While debt stands, the level is frozen
+      at what you had before the shortfall.</p></div>
+  </div>
+</section>
+
+<div class="foot">
+  <div class="status" id="sync"><i></i><span id="syncText">Saving to this device</span></div>
+  <div style="margin-top:6px">13 Sep 2026 &rarr; 26 Oct 2027</div>
+</div>
 </div>
 
 <script>
-/* ---------------- constants ---------------- */
-var START = "2026-09-13", END = "2027-10-26";
-var K = { rest:"var(--i-rest)", low:"var(--i-low)", mod:"var(--i-mod)", high:"var(--i-high)" };
-var KN = { rest:"Recovery", low:"Low", mod:"Moderate", high:"High" };
+var START="2026-09-13", END="2027-10-26";
+var TECH=[["ds","Data Science","var(--m1)"],["dsa","DSA","var(--m2)"],
+          ["sql","SQL","var(--m3)"],["hum","Humility","var(--m4)"]];
+var TECH_REQ=[4,8,8,8,8,8,4];      // Sun..Sat
+var TECH_CAP=8, BAR=0.84, CARDS_PER_MONTH=2, MAX_LEVEL=20;
 
-function pad(n){ return (n<10?"0":"")+n; }
-function ymd(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
-function parseYmd(s){ var p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
-function addDays(d,n){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()+n); return x; }
-function diffDays(a,b){ return Math.round((b-a)/86400000); }
+var FB=[
+ {md:"MD+1",i:[["s1","Active recovery",60],["s2","Lung protocol and peak flow",30],
+               ["s3","Match film, your own actions",60],["s4","Weekly review",60]]},
+ {md:"MD+2",i:[["s1","Ball mastery and mobility",90],["s2","Lower body strength",75],
+               ["s3","Aerobic base, zone 2",45],["s4","Film study",30]]},
+ {md:"MD-4",i:[["s1","Speed mechanics and passing",105],["s2","Club training or SSG",90],
+               ["s3","Core",20],["s4","Recovery and log",45]]},
+ {md:"MD-3",i:[["s1","Aerobic power and dribbling",105],["s2","Upper and posterior chain",70],
+               ["s3","Finishing, 100 strikes",50],["s4","Film and recovery",45]]},
+ {md:"MD-2",i:[["s1","Agility and 1v1",105],["s2","Club training or SSG",90],
+               ["s3","Mobility",30],["s4","Fuel prep and log",45]]},
+ {md:"MD-1",i:[["s1","Activation and set pieces",90],["s2","Deload mobility",45],
+               ["s3","Opponent film",45],["s4","Fuel and sleep protocol",60]]},
+ {md:"MD",  i:[["s1","Pre-match fuel and activation",60],["s2","MATCH",120],
+               ["s3","Cooldown and refuel",60],["s4","Post-match recovery and log",60]]}
+];
+
+var CP=[
+ ["Medical",[
+  ["p1","Pulmonology consult",1,"Gates every conditioning prescription"],
+  ["p2","Spirometry with reversibility",2,"Sets the true aerobic ceiling"],
+  ["p3","Bloods and movement screen",2,"Ferritin, vitamin D, B12, thyroid"],
+  ["p4","Cornea and refractive consult",2,"Decides the procedure at −6.00 D"],
+  ["p5","Refractive surgery",4,"Only non-contact window in the programme"],
+  ["p6","Breathing management plan",4,"Daily protocol and mid-match plan"],
+  ["p7","Cleared for contact",8,"Gate to full training"]]],
+ ["Football",[
+  ["f1","Registered with a club",6,"Without registration there is no record of you"],
+  ["f2","Baseline test battery",6,"Every physical standard, recorded"],
+  ["f3","First competitive minutes",12,"Any minutes, in a registered match"],
+  ["f4","900 competitive minutes",34,"The volume a scout can actually assess"],
+  ["f5","Physical standards met",40,"10 m, 30 m, Yo-Yo, CMJ, body fat"],
+  ["f6","Highlight reel out",36,"Three minutes, full match linked"],
+  ["f7","First trial attended",40,"Pre-season window is May to July"],
+  ["f8","Contract signed",58,"Checkpoint"]]]
+];
+
+function pad(n){return (n<10?"0":"")+n}
+function ymd(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function pymd(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function addD(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x}
+function dif(a,b){return Math.round((b-a)/864e5)}
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 var DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-var DOW3=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-function fmt(d){ return d.getDate()+" "+MON[d.getMonth()]+" "+d.getFullYear(); }
-function fmtShort(d){ return d.getDate()+" "+MON[d.getMonth()]; }
-function mins(t){ var p=t.split(":"); return +p[0]*60+ +p[1]; }
-function dur(a,b){ var m=mins(b)-mins(a); return m>=60 ? (m%60? (m/60|0)+"h "+(m%60)+"m" : (m/60|0)+"h") : m+"m"; }
+function fmt(d){return d.getDate()+" "+MON[d.getMonth()]+" "+d.getFullYear()}
+function h1(n){return (Math.round(n*10)/10).toFixed(1)}
 
-/* ---------------- the microcycle ---------------- */
-/* index 0 = Sunday ... 6 = Saturday. Saturday is matchday. */
-var PLAN = [
- { md:"MD+1", am:[
-     ["08:00","09:00","Active recovery","Easy spin or swim, zone 1 only. Nothing that raises breathing rate.","rest"],
-     ["09:00","09:30","Lung protocol","Breathing drills, prescribed inhaler, peak flow logged before anything else.","rest"],
-     ["09:30","10:00","Walk and daylight","Outdoors, unhurried. Circulation and sleep rhythm, not training.","rest"]],
-   pm:[
-     ["19:00","20:00","Match film, your own actions","Clip every touch you had. Watch decisions, not highlights.","rest"],
-     ["20:00","21:00","Weekly review","Log the week, set next week's targets, check the block objective.","rest"],
-     ["21:00","22:00","Full rest","Screens down by 21:30.","rest"]] },
+var S=pymd(START), E=pymd(END), DB=null, ALL={}, cur, timers={};
+function lsG(p){try{return JSON.parse(localStorage.getItem("inv:"+p)||"null")}catch(e){return null}}
+function lsS(p,v){try{localStorage.setItem("inv:"+p,JSON.stringify(v))}catch(e){}}
+function day(k){if(!ALL[k])ALL[k]=lsG("log/"+k)||{};return ALL[k]}
+function saveDay(k){
+  lsS("log/"+k,ALL[k]);
+  if(!DB)return;
+  clearTimeout(timers[k]);
+  timers[k]=setTimeout(function(){try{DB.collection("log").doc(k).set(ALL[k])["catch"](function(){})}catch(e){}},450);
+}
+var ST={};
+function stG(){if(!ST.cp)ST.cp=lsG("state/cp")||{};return ST.cp}
+function stS(){lsS("state/cp",ST.cp);if(!DB)return;
+  clearTimeout(timers.cp);
+  timers.cp=setTimeout(function(){try{DB.doc("state/cp").set(ST.cp)["catch"](function(){})}catch(e){}},450);}
 
- { md:"MD+2", am:[
-     ["08:00","09:00","Ball mastery","1,000 touches. Both feet, all surfaces, progressive tempo.","low"],
-     ["09:00","09:30","Mobility and prehab","Hips, ankles, hamstring eccentrics, groin. Non-negotiable.","rest"],
-     ["09:30","10:00","Breathing drills, peak flow","Nasal work and diaphragm control. Log the reading.","rest"]],
-   pm:[
-     ["19:00","20:15","Lower body strength","Squat and hinge, 4 x 5 at 85%. The heaviest session of the week.","high"],
-     ["20:15","21:00","Aerobic base","45 min continuous zone 2. Conversational the whole way.","low"],
-     ["21:00","21:30","Film study","One positional role, one match. Take notes.","rest"],
-     ["21:30","22:00","Nutrition and wind-down","Protein, carbs, sleep routine.","rest"]] },
+function todayC(){var t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+  return t<S?S:(t>E?E:t)}
+function techSum(l){var t=0;for(var i=0;i<TECH.length;i++)t+= +(l.tech&&l.tech[TECH[i][0]])||0;return t}
+function fbReq(dw){var t=0,a=FB[dw].i;for(var i=0;i<a.length;i++)t+=a[i][2];return t}
+function fbDone(l,dw){var t=0,a=FB[dw].i,d=l.fb||{};
+  for(var i=0;i<a.length;i++)if(d[a[i][0]])t+=a[i][2];return t}
 
- { md:"MD-4", am:[
-     ["08:00","08:45","Speed mechanics","Accelerations, 8 x 20 m at full effort with long rests.","high"],
-     ["08:45","09:45","Passing under pressure","Receiving on the half-turn, two-touch rondo patterns.","mod"],
-     ["09:45","10:00","Prehab","Ankles and groin.","rest"]],
-   pm:[
-     ["19:00","20:30","Club training or small-sided games","The most important 90 minutes of the week. Compete.","high"],
-     ["20:30","20:50","Core and anti-rotation","Pallof, deadbug, loaded carries.","mod"],
-     ["20:50","21:30","Recovery","Cold exposure, stretch, refuel inside 30 min of finishing.","rest"],
-     ["21:30","22:00","Log the session","RPE, load, what went wrong technically.","rest"]] },
-
- { md:"MD-3", am:[
-     ["08:00","08:50","Aerobic power","4 x 4 min at 90% max HR, 3 min float. Builds the engine.","high"],
-     ["08:50","09:45","Dribbling circuit","1v1 moves executed at full speed, not walking pace.","mod"],
-     ["09:45","10:00","Mobility","Thoracic and hip.","rest"]],
-   pm:[
-     ["19:00","20:10","Upper and posterior chain","Pull, press, Nordics, calf. Injury-proofing as much as strength.","high"],
-     ["20:10","21:00","Finishing","100 strikes, both feet, first time and from the turn.","mod"],
-     ["21:00","21:30","Film study","A player in your position at the level you are chasing.","rest"],
-     ["21:30","22:00","Recovery and wind-down","Stretch, fuel, sleep routine.","rest"]] },
-
- { md:"MD-2", am:[
-     ["08:00","08:45","Agility and change of direction","5-0-5 and T-test patterns. Decelerate hard, that is the skill.","high"],
-     ["08:45","09:45","1v1 and first touch","Under pressure, tight space, both feet.","mod"],
-     ["09:45","10:00","Prehab","Hamstring and groin.","rest"]],
-   pm:[
-     ["19:00","20:30","Club training or small-sided games","Match-speed decisions with real opponents.","high"],
-     ["20:30","21:00","Mobility","Full body, long holds.","rest"],
-     ["21:00","21:30","Match-week fuelling","Cook and portion Friday and Saturday food now.","rest"],
-     ["21:30","22:00","Log and kit prep","Boots, strapping, bag packed tonight.","rest"]] },
-
- { md:"MD-1", am:[
-     ["08:00","08:30","Activation","Short, sharp, primes the nervous system. Leave fresh.","low"],
-     ["08:30","09:30","Set pieces and light technical","Delivery, finishing touch, nothing fatiguing.","low"],
-     ["09:30","10:00","Visualisation and match plan","Your role, your first five actions.","rest"]],
-   pm:[
-     ["19:00","19:45","Deload mobility","Loosen only. No load.","rest"],
-     ["19:45","20:30","Opponent film","How they defend, where the space is.","rest"],
-     ["20:30","21:00","Meal and hydration loading","Carbs in, fluids in, salt in.","rest"],
-     ["21:00","22:00","Wind-down","Asleep by 22:00. This is part of the programme.","rest"]] },
-
- { md:"MD", am:[
-     ["08:00","09:00","Pre-match fuel and activation","Eat 3 hrs out. Light activation at home.","low"],
-     ["09:00","10:00","Travel and arrival routine","Arrive early enough to be bored.","rest"],
-     ["10:00","12:00","MATCH","90 minutes. The only session that counts for a scout.","high"],
-     ["12:00","13:00","Cooldown and refuel","Protein and carbs inside the 30 min window.","rest"]],
-   pm:[
-     ["19:00","20:00","Post-match recovery","Cold, compression, light mobility.","rest"],
-     ["20:00","20:30","Log the match","Minutes, position, actions, your own rating.","rest"],
-     ["20:30","22:00","Rest","Nothing. Earned.","rest"]] }
-];
-
-/* ---------------- blocks ---------------- */
-var BLOCKS = [
- { id:"A", name:"Clearance and base", w0:1, w1:6, stage:"Gate the load",
-   obj:"Find out what body you are actually working with, fix the two medical limiters, and build tissue that tolerates what comes next.",
-   items:["<b>Pulmonology, week 1.</b> Spirometry with reversibility, allergy panel, imaging if indicated. This sets your conditioning ceiling.",
-          "<b>Refractive surgery, weeks 2&ndash;4.</b> The only non-contact window in 59 weeks.",
-          "<b>Bloods.</b> Haemoglobin, ferritin, vitamin D, B12, thyroid &mdash; the usual silent limiters on endurance.",
-          "<b>Baseline battery.</b> Every test on the Benchmarks tab, recorded.",
-          "<b>Register with a Hyderabad club</b> for the coming season. Without a registration there is no record of you.",
-          "Aerobic base, tendon and joint prep, daily ball mastery. No maximal sprinting, no contact."] },
- { id:"B", name:"Engine and strength", w0:7, w1:20, stage:"Build the machine",
-   obj:"The long unglamorous block. Maximum strength and aerobic power go in now because there is no room for them later.",
-   items:["Max strength: two heavy lower sessions, one upper, every week without exception.",
-          "Aerobic power: 4 x 4 intervals twice weekly, progressing.",
-          "Technical volume at its highest of the whole programme.",
-          "<b>First competitive minutes</b> in the local league. Any minutes.",
-          "Retest at week 20. If the engine numbers have not moved, the next block cannot proceed as written."] },
- { id:"C", name:"Speed and competition", w0:21, w1:34, stage:"Get seen playing",
-   obj:"Convert the base into speed, and turn training into a competitive record that someone else can verify.",
-   items:["Sprint and power block. Speed is the single most scouted quality.",
-          "<b>Match minutes every week.</b> Target 900+ competitive minutes across the block.",
-          "Every match filmed. No footage means no evidence.",
-          "Body composition to target by week 34.",
-          "Start building the contact list: coaches, scouts, club staff."] },
- { id:"D", name:"Trials window", w0:35, w1:46, stage:"The signing season",
-   obj:"Indian clubs run pre-season trials May to July. This block is the reason the whole calendar is shaped the way it is.",
-   items:["<b>Highlight reel cut and out</b> by week 36 &mdash; 3 minutes, full-match link attached.",
-          "Applications to I-League 3 and state-league clubs, plus open trials.",
-          "Travel budget committed for trials outside Hyderabad.",
-          "Peak physical condition timed to land here, not in October.",
-          "Maintain match fitness between trials &mdash; do not train through them."] },
- { id:"E", name:"Contract and season entry", w0:47, w1:59, stage:"Checkpoint",
-   obj:"Season kicks off in September. Convert a trial into a registration, and arrive at 26 October attached to a professional setup.",
-   items:["Convert trial invitations into a signed registration.",
-          "Pre-season with the club that takes you.",
-          "If no contract by week 53, widen: second-division sides, feeder clubs, other states.",
-          "<b>26 October 2027 &mdash; checkpoint one.</b>"] }
-];
-
-/* ---------------- allocation ---------------- */
-var ALLOC = [
- ["Ball and technical work","10.2","Touches per week is the only thing that closes a late technical gap."],
- ["Recovery, mobility, prehab","7.0","The 35-hour week is only survivable because a fifth of it is deliberately easy."],
- ["Club training and small-sided games","3.0","Decisions under real pressure. Cannot be replicated alone."],
- ["Strength and power","3.6","Heaviest work furthest from matchday. Also your main injury insurance."],
- ["Film and review","4.0","Cheap hours that raise decision quality when legs cannot give any more."],
- ["Conditioning and aerobic work","2.8","Prescribed against your spirometry numbers, not a generic plan."],
- ["Match and matchday routine","4.0","The only hours a scout ever sees."],
- ["Fuelling, sleep protocol, logging","3.4","Load you cannot recover from is load you did not do."]
-];
-
-/* ---------------- benchmarks ---------------- */
-var BENCH = [
- ["sprint10","10 m sprint","&le; 1.75 s","Timing gates or phone at 240fps. Standing start, best of 3, full recovery."],
- ["sprint30","30 m sprint","&le; 4.20 s","Same setup. Split at 10 m if you can."],
- ["yoyo","Yo-Yo IR1","&ge; level 19","Approx. 1,800 m. The standard aerobic screen at pro trials."],
- ["cmj","Countermovement jump","&ge; 40 cm","Hands on hips. Phone slow-motion against a marked wall."],
- ["cod","5-0-5 change of direction","&le; 2.50 s","Both turning sides. Log the weaker one."],
- ["bf","Body fat","&le; 11 %","Same calipers, same operator, same time of day."],
- ["fev","FEV1, % predicted","&ge; 90 %","From the pulmonologist. Retest every 12 weeks."],
- ["mins","Competitive minutes, cumulative","&ge; 1,500","Registered matches only. Friendlies do not count."]
-];
-
-/* ---------------- health ---------------- */
-var HEALTH = [
- ["h1","Pulmonology consult booked","Week 1","Nothing else is prescribable until this is done"],
- ["h2","Spirometry with reversibility testing","Week 2","Sets your true conditioning ceiling"],
- ["h3","Allergy panel and trigger list","Week 3","Hyderabad air quality is a training variable"],
- ["h4","Written breathing management plan","Week 4","Daily protocol, and what to do mid-match"],
- ["h5","Cornea and refractive consult","Week 2","Decides which procedure is open to you at &minus;6.00 D"],
- ["h6","Refractive surgery","Week 3&ndash;4","The only no-contact window in the programme"],
- ["h7","Post-surgery clearance for contact","Week 8","Gate to full training"],
- ["h8","Bloods: ferritin, vit D, B12, thyroid","Week 2","The silent endurance limiters"],
- ["h9","Movement screen and injury history","Week 1","Shapes the prehab you do every single day"],
- ["h10","Dental and general fitness clearance","Week 6","Clubs ask. Have it ready"],
- ["h11","Spirometry retest","Week 20","Confirms the plan is working"],
- ["h12","Full medical for club registration","Week 47","Required for signing"]
-];
-
-/* ---------------- money ---------------- */
-var MONEY = [
- ["m1","Family loan outstanding","200000","Repaid from your own income, as you wanted"],
- ["m2","Eye correction","200000","Procedure dependent. Confirm at consult in week 2"],
- ["m3","Pulmonology workup and first-year management","50000","Consults, spirometry, imaging, medication"],
- ["m4","Coaching, club fees, physio, kit","405000","Approx. &#8377;30,000 a month across 13.5 months"],
- ["m5","Trial travel and trial fees","100000","Block D. Budget it now, not in May"]
-];
-
-/* ---------------- state ---------------- */
-var DB=null, cur=parseYmd(START), cache={}, saveTimers={};
-var startD=parseYmd(START), endD=parseYmd(END);
-var TOTAL_DAYS=diffDays(startD,endD);
-var TOTAL_WEEKS=Math.ceil((TOTAL_DAYS+1)/7);
-
-function lsGet(p){ try{ return JSON.parse(localStorage.getItem("m27:"+p)||"null"); }catch(e){ return null; } }
-function lsSet(p,v){ try{ localStorage.setItem("m27:"+p,JSON.stringify(v)); }catch(e){} }
-function doc(p){ if(!cache[p]) cache[p]=lsGet(p)||{}; return cache[p]; }
-function dayPath(d){ return "log/"+ymd(d); }
-
-function save(p){
-  lsSet(p,cache[p]);
-  if(!DB) return;
-  clearTimeout(saveTimers[p]);
-  saveTimers[p]=setTimeout(function(){
-    try{ DB.doc(p).set(cache[p]).catch(function(){}); }catch(e){}
-  },500);
+/* The ledger only judges days it was open for. Debt and streak start at the
+   first day carrying an entry, so days that elapsed before you began logging
+   are not charged against you. Self-healing: no extra state to keep in sync. */
+function originDay(){
+  var n=dif(S,todayC());
+  for(var k=0;k<=n;k++){
+    var l=ALL[ymd(addD(S,k))]||lsG("log/"+ymd(addD(S,k)));
+    if(l&&(techSum(l)>0||(l.fb&&Object.keys(l.fb).length>0)||l.card))return k;
+  }
+  return n;
 }
 
-function weekNo(d){ var n=diffDays(startD,d); return Math.floor(n/7)+1; }
-function blockFor(w){
-  for(var i=0;i<BLOCKS.length;i++){ if(w>=BLOCKS[i].w0 && w<=BLOCKS[i].w1) return BLOCKS[i]; }
-  return w<1 ? BLOCKS[0] : BLOCKS[BLOCKS.length-1];
+/* one pass over every elapsed day: streak, debt, storage */
+function computeAll(){
+  var t=todayC(), r={tech:0,fb:0,byMetric:{},days:0,debt:0,streak:0,best:0,cards:0};
+  var org=originDay();
+  for(var i=0;i<TECH.length;i++)r.byMetric[TECH[i][0]]=0;
+  var pass=[], n=dif(S,t), curMonth=ymd(t).slice(0,7), run=0, best=0, credit=0, owed=0;
+  for(var k=0;k<=n;k++){
+    var d=addD(S,k), key=ymd(d), dw=d.getDay(), l=ALL[key]||lsG("log/"+key)||{};
+    var tq=TECH_REQ[dw], ts=techSum(l), fq=fbReq(dw), fs=fbDone(l,dw), card=!!l.card;
+    var logged=ts>0||fs>0||card;
+    if(logged)r.days++;
+    r.tech+=ts; r.fb+=fs/60;
+    for(var m=0;m<TECH.length;m++)r.byMetric[TECH[m][0]]+= +(l.tech&&l.tech[TECH[m][0]])||0;
+    if(card&&key.slice(0,7)===curMonth)r.cards++;
+    var isToday=(key===ymd(t));
+    // debt and streak are only settled once a day is over, and only from the
+    // day the ledger was first used
+    if(!isToday&&k>=org){
+      owed+=Math.max(0,tq-ts)+Math.max(0,(fq-fs)/60)*(card?0:1);
+      credit+=Math.max(0,ts-tq);
+      var ok=(ts>=tq*BAR)&&((fs>=fq*BAR)||card);
+      if(ok){run++;if(run>best)best=run}else run=0;
+    }
+    pass.push({key:key,tech:ts,fb:fs/60});
+  }
+  // today counts toward the streak as soon as it qualifies
+  var tl=ALL[ymd(t)]||lsG("log/"+ymd(t))||{}, tdw=t.getDay();
+  var tOk=(techSum(tl)>=TECH_REQ[tdw]*BAR)&&((fbDone(tl,tdw)>=fbReq(tdw)*BAR)||!!tl.card);
+  r.streak=run+(tOk?1:0);
+  r.best=Math.max(best,r.streak);
+  r.debt=Math.max(0,owed-credit);
+  r.series=pass;
+  return r;
 }
-function blockStart(b){ return addDays(startD,(b.w0-1)*7); }
-function blockEnd(b){ var e=addDays(startD,b.w1*7-1); return e>endD?endD:e; }
-function todayClamped(){
-  var t=new Date(); t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
-  if(t<startD) return startD; if(t>endD) return endD; return t;
-}
-function allSlots(day){ return PLAN[day].am.concat(PLAN[day].pm); }
-function slotId(day,i){ return "d"+day+"s"+i; }
-function dayLoad(day){
-  var s=allSlots(day), sc={rest:0,low:1,mod:2,high:3}, tot=0, m=0;
-  for(var i=0;i<s.length;i++){ var mm=mins(s[i][1])-mins(s[i][0]); tot+=sc[s[i][4]]*mm; m+=mm; }
-  return { au:Math.round(tot/60), hrs:(m/60) };
+function cpAll(){var a=[];for(var i=0;i<CP.length;i++)a=a.concat(CP[i][1]);return a}
+function cpCleared(){var c=stG(),a=cpAll(),n=0;for(var i=0;i<a.length;i++)if(c[a[i][0]])n++;return n}
+function levelInfo(){
+  var R=computeAll(), tot=cpAll().length, cl=cpCleared();
+  var p=0.6*(cl/tot)+0.4*Math.min(1,R.best/365);
+  var lvl=Math.min(MAX_LEVEL,1+Math.floor(p*(MAX_LEVEL-1)));
+  return {R:R,p:p,lvl:lvl,cl:cl,tot:tot};
 }
 
-/* ---------------- render: today ---------------- */
-function renderDay(){
-  var day=cur.getDay(), p=PLAN[day], w=weekNo(cur), b=blockFor(w), L=dayLoad(day);
-  document.getElementById("dDow").textContent=DOW[day];
+/* ---------- render ---------- */
+function rHeader(){
+  var L=levelInfo();
+  document.getElementById("hLvl").textContent=L.lvl;
+  document.getElementById("hStreak").textContent=L.R.streak+"d";
+  document.getElementById("hRemain").textContent=Math.round((1-L.p)*100)+"%";
+  var de=document.getElementById("hDebt");
+  de.textContent=L.R.debt>0?h1(L.R.debt)+"h":"0";
+  de.parentNode.style.opacity=L.R.debt>0?"1":".55";
+}
+
+function rDaily(){
+  var dw=cur.getDay(), l=day(ymd(cur)), tq=TECH_REQ[dw], ts=techSum(l);
+  document.getElementById("dDow").textContent=DOW[dw];
   document.getElementById("dDate").textContent=fmt(cur);
-  document.getElementById("dMd").textContent=p.md;
-  document.getElementById("dWeek").textContent="Week "+w+" · Block "+b.id+" — "+b.name;
-  document.getElementById("dLoad").textContent=L.hrs.toFixed(1)+" hrs · load "+L.au;
+  document.getElementById("dMd").textContent=FB[dw].md;
 
-  var log=doc(dayPath(cur)), done=log.done||{};
-  var slots=[], html="", prevEnd=null;
-  function row(s,i){
-    var id=slotId(day,i), isDone=!!done[id];
-    return '<div class="slot'+(isDone?" done":"")+'" data-id="'+id+'">'+
-      '<div class="slot-time">'+s[0]+'<br>'+s[1]+'</div>'+
-      '<div class="slot-bar" style="background:'+K[s[4]]+'"></div>'+
-      '<div class="slot-body"><div class="slot-title">'+s[2]+'</div>'+
-      '<div class="slot-detail">'+s[3]+'</div>'+
-      '<div class="slot-meta"><span class="tag" style="background:'+K[s[4]]+'">'+KN[s[4]]+'</span>'+
-      '<span class="dur">'+dur(s[0],s[1])+'</span></div></div>'+
-      '<div class="slot-check"><input type="checkbox" aria-label="Completed: '+s[2]+'"'+(isDone?" checked":"")+'></div></div>';
+  var mh="";
+  for(var i=0;i<TECH.length;i++){
+    var m=TECH[i], v=(l.tech&&l.tech[m[0]])!==undefined?l.tech[m[0]]:"";
+    mh+='<div class="met"><div class="lab"><i style="background:'+m[2]+'"></i><span>'+m[1]+'</span></div>'+
+        '<input type="number" min="0" max="8" step="0.5" inputmode="decimal" data-m="'+m[0]+
+        '" value="'+v+'" placeholder="0" aria-label="'+m[1]+' hours"><span class="hint">hours</span></div>';
   }
-  var idx=0;
-  for(var i=0;i<p.am.length;i++){ html+=row(p.am[i],idx++); slots.push(1); prevEnd=p.am[i][1]; }
-  var pmStart=p.pm[0][0];
-  if(mins(pmStart)>mins(prevEnd)){
-    html+='<div class="slot gap"><div class="slot-time">'+prevEnd+'<br>'+pmStart+'</div>'+
-      '<div class="slot-bar" style="background:var(--rule-2)"></div>'+
-      '<div class="slot-body"><div class="slot-title">'+
-      (day===0||day===6 ? "Open — job hours do not apply" : "Day job")+
-      '</div><div class="slot-detail">'+
-      (day===0||day===6 ? "Use it for a second technical session, admin, or genuine rest."
-                        : "Eat properly. Walk between meetings. Protect the 19:00 start.")+
-      '</div></div><div class="slot-check"></div></div>';
-  }
-  for(var j=0;j<p.pm.length;j++){ html+=row(p.pm[j],idx++); slots.push(1); }
-  var ruler=document.getElementById("ruler");
-  ruler.innerHTML=html;
+  document.getElementById("metrics").innerHTML=mh;
+  document.getElementById("tNote").textContent=h1(ts)+" / "+tq+" hrs · cap "+TECH_CAP;
+  var tb=document.getElementById("tBar");
+  tb.style.width=Math.min(100,tq?ts/tq*100:100)+"%";
+  tb.parentNode.className="track "+(ts>=tq*BAR?"ok":(ts>0?"":"no"));
 
-  var total=slots.length, ndone=0;
-  for(var k=0;k<total;k++){ if(done[slotId(day,k)]) ndone++; }
-  document.getElementById("doneNote").textContent=ndone+" of "+total+" complete";
-  document.getElementById("dayBar").style.width=(total?Math.round(ndone/total*100):0)+"%";
-
-  var boxes=ruler.querySelectorAll(".slot input[type=checkbox]");
-  for(var q=0;q<boxes.length;q++){
-    boxes[q].addEventListener("change",function(ev){
-      var slot=ev.target.closest(".slot"), id=slot.getAttribute("data-id");
-      var lg=doc(dayPath(cur)); if(!lg.done) lg.done={};
-      if(ev.target.checked) lg.done[id]=true; else delete lg.done[id];
-      save(dayPath(cur)); renderDay(); renderWeekStrip();
-    });
+  var a=FB[dw].i, dn=l.fb||{}, fh="", fq=fbReq(dw), fs=fbDone(l,dw);
+  for(var j=0;j<a.length;j++){
+    var on=!!dn[a[j][0]];
+    fh+='<div class="fbrow'+(on?" done":"")+'"><span class="t">'+a[j][1]+'</span>'+
+        '<span class="m">'+a[j][2]+' min</span>'+
+        '<input type="checkbox" data-f="'+a[j][0]+'"'+(on?" checked":"")+' aria-label="'+a[j][1]+'"></div>';
   }
-  bindCaptures();
+  document.getElementById("fblist").innerHTML=fh;
+  document.getElementById("fNote").textContent=Math.round(fs/fq*100)+"% · "+fs+" / "+fq+" min";
+  var fb=document.getElementById("fBar");
+  fb.style.width=Math.min(100,fs/fq*100)+"%";
+  fb.parentNode.className="track "+(fs>=fq*BAR?"ok":(fs>0?"":"no"));
+
+  var R=computeAll(), left=CARDS_PER_MONTH-R.cards;
+  var cb=document.getElementById("cardBtn");
+  cb.classList.toggle("on",!!l.card);
+  cb.textContent=l.card?"Break card used":"Use break card";
+  cb.disabled=!l.card&&left<=0;
+  document.getElementById("cardNote").textContent=Math.max(0,left)+" of "+CARDS_PER_MONTH+" left this month · football only";
+
+  var tOk=ts>=tq*BAR, fOk=(fs>=fq*BAR)||!!l.card;
+  var v=document.getElementById("verdict"), mk=document.getElementById("vMark"), ms=document.getElementById("vMsg");
+  var isToday=ymd(cur)===ymd(todayC());
+  if(tOk&&fOk){
+    v.className="verdict pass"; mk.textContent="Held";
+    ms.innerHTML="Both bars cleared. Streak <b>"+R.streak+" days</b>.";
+  }else if(ts===0&&fs===0&&!l.card&&isToday){
+    v.className="verdict open"; mk.textContent="Open";
+    ms.innerHTML="Nothing ingested yet. Need <b>"+h1(tq*BAR)+" technical hours</b> and <b>"+
+      Math.ceil(fq*BAR)+" football minutes</b>.";
+  }else{
+    v.className="verdict fail"; mk.textContent="Broken";
+    var why=[];
+    if(!tOk)why.push("technical short by <b>"+h1(Math.max(0,tq*BAR-ts))+"h</b>");
+    if(!fOk)why.push("football short by <b>"+Math.ceil(Math.max(0,fq*BAR-fs))+" min</b>");
+    ms.innerHTML=why.join(", ")+". Shortfall against the full requirement is added to debt at 1&times;.";
+  }
+
+  var ins=document.getElementById("metrics").querySelectorAll("input[data-m]");
+  for(var q=0;q<ins.length;q++)ins[q].addEventListener("change",onTech);
+  var fbs=document.getElementById("fblist").querySelectorAll("input[data-f]");
+  for(var z=0;z<fbs.length;z++)fbs[z].addEventListener("change",onFb);
 }
+function onTech(ev){
+  var l=day(ymd(cur)); if(!l.tech)l.tech={};
+  var k=ev.target.getAttribute("data-m"), val=ev.target.value===""?null:Math.max(0,+ev.target.value||0);
+  if(val===null)delete l.tech[k]; else l.tech[k]=val;
+  var s=techSum(l);
+  if(s>TECH_CAP){ l.tech[k]=Math.max(0,val-(s-TECH_CAP)); }
+  saveDay(ymd(cur)); rDaily(); rHeader();
+}
+function onFb(ev){
+  var l=day(ymd(cur)); if(!l.fb)l.fb={};
+  var k=ev.target.getAttribute("data-f");
+  if(ev.target.checked)l.fb[k]=true; else delete l.fb[k];
+  saveDay(ymd(cur)); rDaily(); rHeader();
+}
+document.getElementById("cardBtn").addEventListener("click",function(){
+  var l=day(ymd(cur));
+  if(l.card)delete l.card; else l.card=true;
+  saveDay(ymd(cur)); rDaily(); rHeader();
+});
 
-var CAPS=[["cRpe","rpe"],["cSleep","sleep"],["cHr","hr"],["cPef","pef"],["cWt","wt"],["cMin","min"],["cNote","note"]];
-function bindCaptures(){
-  var log=doc(dayPath(cur));
-  CAPS.forEach(function(c){
-    var el=document.getElementById(c[0]);
-    el.value = (log[c[1]]===undefined||log[c[1]]===null) ? "" : log[c[1]];
-    if(el.dataset.bound) return;
-    el.dataset.bound="1";
-    el.addEventListener("input",function(){
-      var lg=doc(dayPath(cur));
-      if(el.value==="") delete lg[c[1]]; else lg[c[1]]=el.value;
-      save(dayPath(cur));
-    });
+function rCp(){
+  var c=stG(), t=todayC(), html="";
+  for(var g=0;g<CP.length;g++){
+    var rows="", n=0;
+    for(var i=0;i<CP[g][1].length;i++){
+      var it=CP[g][1][i], on=!!c[it[0]], due=addD(S,it[2]*7-1), late=!on&&t>due;
+      if(on)n++;
+      rows+='<div class="cprow'+(on?" done":"")+(late?" late":"")+'">'+
+        '<input type="checkbox" data-c="'+it[0]+'"'+(on?" checked":"")+' aria-label="'+it[1]+'">'+
+        '<div><div class="t">'+it[1]+'</div><div class="s">'+it[3]+'</div></div>'+
+        '<div class="due">W'+it[2]+' · '+due.getDate()+" "+MON[due.getMonth()]+'</div></div>';
+    }
+    html+='<div class="cpgroup"><div class="gh"><h3>'+CP[g][0]+'</h3>'+
+      '<span class="c">'+n+" / "+CP[g][1].length+'</span></div><div class="cplist">'+rows+'</div></div>';
+  }
+  document.getElementById("cpGroups").innerHTML=html;
+  var cl=cpCleared(), tot=cpAll().length;
+  document.getElementById("goalDt").textContent="26 Oct 2027 · "+Math.max(0,dif(new Date(),E))+" days left";
+  document.getElementById("goalBar").style.width=(cl/tot*100)+"%";
+  document.getElementById("goalPct").textContent=cl+" of "+tot+" checkpoints cleared";
+  var ins=document.getElementById("cpGroups").querySelectorAll("input[data-c]");
+  for(var q=0;q<ins.length;q++)ins[q].addEventListener("change",function(ev){
+    var s=stG(), k=ev.target.getAttribute("data-c");
+    if(ev.target.checked)s[k]=true; else delete s[k];
+    stS(); rCp(); rHeader(); rLevel();
   });
 }
 
-function renderWeekStrip(){
-  var base=addDays(cur,-cur.getDay()), html="", today=ymd(todayClamped());
-  for(var i=0;i<7;i++){
-    var d=addDays(base,i), lg=cache[dayPath(d)]||lsGet(dayPath(d))||{};
-    var done=lg.done||{}, tot=allSlots(d.getDay()).length, n=0;
-    for(var k=0;k<tot;k++){ if(done[slotId(d.getDay(),k)]) n++; }
-    var pct=tot?Math.round(n/tot*100):0;
-    html+='<div class="wkd'+(ymd(d)===today?" is-today":"")+'">'+
-      '<div class="bar"><i style="height:'+pct+'%"></i></div>'+
-      '<div class="lb">'+DOW3[i].toUpperCase()+'</div></div>';
+function rStore(){
+  var R=computeAll(), tot=R.tech+R.fb;
+  document.getElementById("sTotal").textContent=h1(tot);
+  document.getElementById("sTech").textContent=h1(R.tech);
+  document.getElementById("sFb").textContent=h1(R.fb);
+  document.getElementById("sDays").textContent=R.days;
+  document.getElementById("sTechD").textContent=tot?Math.round(R.tech/tot*100)+"% of store":"—";
+  document.getElementById("sFbD").textContent=tot?Math.round(R.fb/tot*100)+"% of store":"—";
+  document.getElementById("sDaysD").textContent="of "+(dif(S,todayC())+1)+" elapsed";
+
+  var mx=0;
+  for(var i=0;i<TECH.length;i++)mx=Math.max(mx,R.byMetric[TECH[i][0]]);
+  var ch="";
+  for(var j=0;j<TECH.length;j++){
+    var m=TECH[j], v=R.byMetric[m[0]];
+    ch+='<div class="srow"><span class="l"><i style="background:'+m[2]+'"></i>'+m[1]+'</span>'+
+      '<span class="track"><i style="width:'+(mx?v/mx*100:0)+'%;background:'+m[2]+'"></i></span>'+
+      '<span class="v">'+h1(v)+'h</span></div>';
   }
-  document.getElementById("wkStrip").innerHTML=html;
+  document.getElementById("composition").innerHTML=ch;
+
+  var ser=R.series.slice(-30), peak=1;
+  for(var k=0;k<ser.length;k++)peak=Math.max(peak,ser[k].tech+ser[k].fb);
+  var gh="";
+  for(var z=0;z<ser.length;z++){
+    var d=ser[z], th=d.tech/peak*100, fh=d.fb/peak*100;
+    gh+='<div class="c" title="'+d.key+'"><i class="fb" style="height:'+fh+'%"></i>'+
+        '<i class="tech" style="height:'+th+'%"></i></div>';
+  }
+  document.getElementById("chart").innerHTML=gh;
+  document.getElementById("dOut").textContent=R.debt>0?h1(R.debt)+" hrs":"none";
+  document.getElementById("dClear").textContent=R.debt>0?"log beyond the daily requirement":"balanced";
 }
 
-/* ---------------- render: microcycle ---------------- */
-function renderMicro(){
-  var html="", totH=0, today=todayClamped().getDay();
-  for(var d=0;d<7;d++){
-    var p=PLAN[d], L=dayLoad(d); totH+=L.hrs;
-    html+='<div class="mc-col"><div class="mc-h'+(d===today?" today":"")+'">'+
-      '<div class="d">'+DOW3[d]+'</div><div class="m">'+p.md+' · '+L.hrs.toFixed(1)+'h</div></div>';
-    html+='<div class="mc-part">Morning 08:00</div>';
-    for(var i=0;i<p.am.length;i++){
-      html+='<div class="mc-sess"><span class="dot" style="background:'+K[p.am[i][4]]+'"></span><span>'+
-        p.am[i][2]+'<br><span style="color:var(--ink-3);font-family:var(--mono);font-size:10px">'+
-        p.am[i][0]+'–'+p.am[i][1]+'</span></span></div>';
-    }
-    html+='<div class="mc-part">Evening 19:00</div>';
-    for(var j=0;j<p.pm.length;j++){
-      html+='<div class="mc-sess"><span class="dot" style="background:'+K[p.pm[j][4]]+'"></span><span>'+
-        p.pm[j][2]+'<br><span style="color:var(--ink-3);font-family:var(--mono);font-size:10px">'+
-        p.pm[j][0]+'–'+p.pm[j][1]+'</span></span></div>';
-    }
-    html+='</div>';
-  }
-  document.getElementById("mcGrid").innerHTML=html;
-  document.getElementById("mcTotal").textContent=totH.toFixed(1)+" hrs per week";
-  var ab="";
-  for(var a=0;a<ALLOC.length;a++){
-    ab+='<tr><td><b>'+ALLOC[a][0]+'</b></td><td class="n">'+ALLOC[a][1]+'</td><td style="color:var(--ink-2)">'+ALLOC[a][2]+'</td></tr>';
-  }
-  document.getElementById("allocBody").innerHTML=ab;
+function rLevel(){
+  var L=levelInfo(), R=L.R;
+  document.getElementById("lNum").textContent=L.lvl;
+  document.getElementById("lTitle").textContent="Level "+L.lvl+" of "+MAX_LEVEL;
+  document.getElementById("lBar").style.width=(L.p*100)+"%";
+  document.getElementById("lSub").textContent=Math.round(L.p*100)+"% of the journey covered · "+
+    Math.round((1-L.p)*100)+"% remaining";
+  document.getElementById("dvCp").textContent=L.cl+" / "+L.tot;
+  document.getElementById("dvCpBar").style.width=(L.cl/L.tot*100)+"%";
+  document.getElementById("dvSt").textContent=R.best+" / 365";
+  document.getElementById("dvStBar").style.width=Math.min(100,R.best/365*100)+"%";
+  document.getElementById("stNow").textContent=R.streak+" days";
+  document.getElementById("stBest").textContent=R.best+" days";
+  document.getElementById("stCards").textContent=Math.max(0,CARDS_PER_MONTH-R.cards)+" of "+CARDS_PER_MONTH;
+  document.getElementById("stDebt").textContent=R.debt>0?h1(R.debt)+" hrs":"none";
+  document.getElementById("stDays").textContent=Math.max(0,dif(new Date(),E));
+  document.getElementById("stRem").textContent=Math.round((1-L.p)*100)+"%";
 }
 
-/* ---------------- render: programme ---------------- */
-function renderBlocks(){
-  var w=weekNo(todayClamped()), html="";
-  for(var i=0;i<BLOCKS.length;i++){
-    var b=BLOCKS[i], now=(w>=b.w0&&w<=b.w1);
-    html+='<div class="blk'+(now?" now":"")+'"><div class="blk-l">'+
-      '<div class="wk">Block '+b.id+' · Weeks '+b.w0+'–'+b.w1+'</div>'+
-      '<h3>'+b.name+'</h3>'+
-      '<div class="dt">'+fmtShort(blockStart(b))+' – '+fmt(blockEnd(b))+'</div>'+
-      '<div class="st">'+(now?"● In progress":b.stage)+'</div></div>'+
-      '<div class="blk-r"><p class="obj">'+b.obj+'</p><ul>';
-    for(var j=0;j<b.items.length;j++) html+='<li>'+b.items[j]+'</li>';
-    html+='</ul></div></div>';
-  }
-  document.getElementById("blockList").innerHTML=html;
-}
+function all(){rHeader();rDaily();rCp();rStore();rLevel()}
 
-/* ---------------- render: benchmarks ---------------- */
-function renderBench(){
-  var st=doc("state/benchmarks"), v=st.v||{}, html="";
-  for(var i=0;i<BENCH.length;i++){
-    var b=BENCH[i];
-    html+='<tr><td><b>'+b[1]+'</b></td>'+
-      '<td class="n"><input class="inline" data-bk="'+b[0]+'" value="'+(v[b[0]]||"")+'" placeholder="—"></td>'+
-      '<td class="n" style="color:var(--accent);font-weight:600">'+b[2]+'</td>'+
-      '<td style="color:var(--ink-2)">'+b[3]+'</td></tr>';
-  }
-  var body=document.getElementById("benchBody");
-  body.innerHTML=html;
-  var ins=body.querySelectorAll("input[data-bk]");
-  for(var q=0;q<ins.length;q++){
-    ins[q].addEventListener("input",function(ev){
-      var s=doc("state/benchmarks"); if(!s.v) s.v={};
-      var key=ev.target.getAttribute("data-bk");
-      if(ev.target.value==="") delete s.v[key]; else s.v[key]=ev.target.value;
-      save("state/benchmarks");
-    });
-  }
-}
-
-/* ---------------- render: health ---------------- */
-function renderHealth(){
-  var st=doc("state/health"), c=st.c||{}, html="", n=0;
-  for(var i=0;i<HEALTH.length;i++){
-    var h=HEALTH[i], on=!!c[h[0]]; if(on) n++;
-    html+='<tr><td><input type="checkbox" data-hk="'+h[0]+'" aria-label="'+h[1]+'" style="width:17px;height:17px;accent-color:var(--accent)"'+(on?" checked":"")+'></td>'+
-      '<td'+(on?' style="color:var(--ink-3);text-decoration:line-through"':'')+'><b>'+h[1]+'</b></td>'+
-      '<td class="n" style="color:var(--accent)">'+h[2]+'</td>'+
-      '<td style="color:var(--ink-2)">'+h[3]+'</td></tr>';
-  }
-  var body=document.getElementById("healthBody");
-  body.innerHTML=html;
-  document.getElementById("healthNote").textContent=n+" of "+HEALTH.length+" cleared";
-  var ins=body.querySelectorAll("input[data-hk]");
-  for(var q=0;q<ins.length;q++){
-    ins[q].addEventListener("change",function(ev){
-      var s=doc("state/health"); if(!s.c) s.c={};
-      var key=ev.target.getAttribute("data-hk");
-      if(ev.target.checked) s.c[key]=true; else delete s.c[key];
-      save("state/health"); renderHealth();
-    });
-  }
-}
-
-/* ---------------- render: money ---------------- */
-function inr(n){
-  n=Math.round(n); var s=String(n), last3=s.slice(-3), rest=s.slice(0,-3);
-  if(rest) rest=rest.replace(/\B(?=(\d{2})+(?!\d))/g,",");
-  return "₹"+(rest?rest+",":"")+last3;
-}
-function renderMoney(){
-  var st=doc("state/money"), p=st.p||{}, html="", tot=0, paid=0;
-  for(var i=0;i<MONEY.length;i++){
-    var m=MONEY[i], amt=+m[2], pd=+(p[m[0]]||0);
-    tot+=amt; paid+=pd;
-    var pct=Math.min(100,Math.round(pd/amt*100));
-    html+='<tr><td><b>'+m[1]+'</b><div class="bar track" style="margin-top:8px"><i style="width:'+pct+'%;background:'+(pct>=100?"var(--good)":"var(--accent)")+'"></i></div></td>'+
-      '<td class="n">'+inr(amt)+'</td>'+
-      '<td class="n"><input class="inline" data-mk="'+m[0]+'" value="'+(p[m[0]]||"")+'" placeholder="0"></td>'+
-      '<td style="color:var(--ink-2)">'+m[3]+'</td></tr>';
-  }
-  var rem=tot-paid;
-  html+='<tr style="background:var(--panel-2)"><td><b>Total self-funded requirement</b></td>'+
-    '<td class="n"><b>'+inr(tot)+'</b></td><td class="n"><b>'+inr(paid)+'</b></td>'+
-    '<td style="color:var(--ink-2)"><b>'+inr(rem)+'</b> outstanding · '+
-    Math.max(1,Math.ceil(rem/81000))+' months at the target surplus</td></tr>';
-  var body=document.getElementById("moneyBody");
-  body.innerHTML=html;
-  var ins=body.querySelectorAll("input[data-mk]");
-  for(var q=0;q<ins.length;q++){
-    ins[q].addEventListener("change",function(ev){
-      var s=doc("state/money"); if(!s.p) s.p={};
-      var key=ev.target.getAttribute("data-mk");
-      if(ev.target.value==="") delete s.p[key]; else s.p[key]=+ev.target.value||0;
-      save("state/money"); renderMoney();
-    });
-  }
-}
-
-/* ---------------- header ---------------- */
-function renderHeader(){
-  var t=new Date(); t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
-  var left=Math.max(0,diffDays(t,endD));
-  var w=Math.min(TOTAL_WEEKS,Math.max(1,weekNo(t)));
-  var b=blockFor(w);
-  document.getElementById("cdDays").textContent=left;
-  document.getElementById("cdWeeks").textContent=Math.ceil(left/7);
-  document.getElementById("cdWeekNo").textContent=w+"/"+TOTAL_WEEKS;
-  document.getElementById("cdBlock").textContent=b.id;
-}
-
-/* ---------------- tabs ---------------- */
-var VIEWS=["today","week","program","bench","health","money"];
+var V=["cp","daily","store","level"];
 function show(v){
-  for(var i=0;i<VIEWS.length;i++){
-    document.getElementById("v-"+VIEWS[i]).classList.toggle("hide",VIEWS[i]!==v);
-  }
-  var tabs=document.querySelectorAll(".tab");
-  for(var q=0;q<tabs.length;q++){
-    tabs[q].setAttribute("aria-selected",tabs[q].getAttribute("data-view")===v?"true":"false");
-  }
+  for(var i=0;i<V.length;i++)document.getElementById("v-"+V[i]).classList.toggle("hide",V[i]!==v);
+  var t=document.querySelectorAll(".tab");
+  for(var q=0;q<t.length;q++)t[q].setAttribute("aria-selected",t[q].getAttribute("data-v")===v?"true":"false");
 }
-var tabEls=document.querySelectorAll(".tab");
-for(var t=0;t<tabEls.length;t++){
-  tabEls[t].addEventListener("click",function(ev){ show(ev.target.getAttribute("data-view")); });
-}
+var tabs=document.querySelectorAll(".tab");
+for(var i=0;i<tabs.length;i++)tabs[i].addEventListener("click",function(e){show(e.target.getAttribute("data-v"))});
+document.getElementById("prev").addEventListener("click",function(){if(dif(S,cur)>0){cur=addD(cur,-1);all()}});
+document.getElementById("next").addEventListener("click",function(){if(cur<E){cur=addD(cur,1);all()}});
+document.getElementById("today").addEventListener("click",function(){cur=todayC();all()});
 
-document.getElementById("prevDay").addEventListener("click",function(){
-  if(diffDays(startD,cur)>0){ cur=addDays(cur,-1); renderDay(); renderWeekStrip(); pullDay(); }
-});
-document.getElementById("nextDay").addEventListener("click",function(){
-  if(cur<endD){ cur=addDays(cur,1); renderDay(); renderWeekStrip(); pullDay(); }
-});
-document.getElementById("todayBtn").addEventListener("click",function(){
-  cur=todayClamped(); renderDay(); renderWeekStrip(); pullDay();
-});
+cur=todayC();
+all();
 
-/* ---------------- boot ---------------- */
-cur=todayClamped();
-renderHeader(); renderDay(); renderWeekStrip(); renderMicro();
-renderBlocks(); renderBench(); renderHealth(); renderMoney();
-
-/* ---------------- db, if this view can run it ---------------- */
-function pullDay(){
-  if(!DB) return;
-  var base=addDays(cur,-cur.getDay()), paths=[];
-  for(var i=0;i<7;i++) paths.push(dayPath(addDays(base,i)));
-  Promise.all(paths.map(function(p){
-    return DB.doc(p).get().then(function(s){ if(s.exists) { cache[p]=s.data(); lsSet(p,cache[p]); } })
-      .catch(function(){});
-  })).then(function(){ renderDay(); renderWeekStrip(); });
-}
 (function(){
-  if(!window.claude || typeof window.claude.use!=="function") return;
+  if(!window.claude||typeof window.claude.use!=="function")return;
   window.claude.use("db").then(function(d){
-    if(!d) return;
+    if(!d)return;
     DB=d;
-    var s=document.getElementById("syncStatus");
-    s.classList.add("live");
+    document.getElementById("sync").classList.add("live");
     document.getElementById("syncText").textContent="Synced · laptop and phone";
-    var states=["state/benchmarks","state/health","state/money"];
-    Promise.all(states.map(function(p){
-      return DB.doc(p).get().then(function(sn){ if(sn.exists){ cache[p]=sn.data(); lsSet(p,cache[p]); } })
-        .catch(function(){});
-    })).then(function(){ renderBench(); renderHealth(); renderMoney(); });
-    pullDay();
-  }).catch(function(){});
+    DB.doc("state/cp").get().then(function(s){if(s.exists){ST.cp=s.data();lsS("state/cp",ST.cp)}})
+      ["catch"](function(){});
+    DB.collection("log").limit(1000).get().then(function(q){
+      for(var i=0;i<q.docs.length;i++){var dd=q.docs[i];ALL[dd.id]=dd.data();lsS("log/"+dd.id,ALL[dd.id])}
+      all();
+    })["catch"](function(){});
+  })["catch"](function(){});
 })();
 </script>
 

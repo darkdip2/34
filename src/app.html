@@ -524,6 +524,8 @@ function setSync(state,at,detail){
   else if(state==="error"){tx.textContent="Cloud write failed";
     why.textContent=(SYNC.detail?SYNC.detail+" — ":"")+
       "Held on this device and will retry. Copy the JSON from the Storage tab if you need it safe now.";}
+  else if(state==="waking"){tx.textContent="Server waking up…";
+    why.textContent="Free instances sleep when idle and can take up to a minute to start. Your entry is safe on this device and will be sent as soon as it answers.";}
   else if(state==="needkey"){tx.textContent="Access key needed";
     why.textContent="This server holds your ledger but will not open it without the key. Render generated it — Dashboard → your service → Environment → LEDGER_KEY.";}
   else if(state==="none"){tx.textContent="No cloud store on this deployment";
@@ -539,15 +541,22 @@ function setSync(state,at,detail){
    Access is one shared key, held in this browser and sent as a bearer token.
    The server merges per day exactly as the client does, so two devices writing
    whole blobs cannot erase each other. */
-var KKEY="inv:key", API=false;
+var KKEY="inv:key", API=false, DIRTY=false;
 function apiKey(){try{return localStorage.getItem(KKEY)||""}catch(e){return ""}}
 function setApiKey(k){try{k?localStorage.setItem(KKEY,k):localStorage.removeItem(KKEY)}catch(e){}}
 function apiFetch(method,body){
+  // A free Render instance sleeps after idle and can take most of a minute to
+  // wake. Without a bound here the browser hangs on its own long timeout and
+  // no retry ever runs.
+  var ctl = (typeof AbortController==="function") ? new AbortController() : null;
+  var killer = ctl ? setTimeout(function(){ctl.abort()},25000) : null;
   return fetch("/api/ledger",{
     method:method,
+    signal:ctl?ctl.signal:undefined,
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey()},
     body:body?JSON.stringify(body):undefined
   }).then(function(r){
+    if(killer)clearTimeout(killer);
     if(r.ok)return r.json();
     // Carry the server's own explanation up to the footer. A bare "failed"
     // leaves you guessing between a missing key, a missing database and a
@@ -559,8 +568,23 @@ function apiFetch(method,body){
       throw e;
     });
   },function(){
+    if(killer)clearTimeout(killer);
     var e=new Error("unreachable");e.code=0;
-    e.detail="Could not reach the server at all — it may be asleep or still deploying.";
+    e.detail="Could not reach the server.";
+    throw e;
+  });
+}
+
+/* A sleeping instance is not a failure, it is a wait. Retry with backoff and
+   say so, instead of reporting the first timeout as a lost write. */
+function apiRetry(method,body,tries){
+  tries=tries||0;
+  return apiFetch(method,body)["catch"](function(e){
+    if(e.code===0&&tries<4){
+      setSync("waking");
+      return new Promise(function(res){setTimeout(res,3000+tries*4000)})
+        .then(function(){return apiRetry(method,body,tries+1)});
+    }
     throw e;
   });
 }
@@ -580,8 +604,9 @@ function pushRemote(){
   if(API){
     if(!apiKey()){setSync("needkey");return}
     setSync("saving");
-    apiFetch("PUT",LG).then(function(r){
+    apiRetry("PUT",LG).then(function(r){
       if(r&&r.doc&&merge(r.doc)){writeLocal();all()}
+      DIRTY=false;
       setSync("synced",new Date());
     },function(e){setSync(e.code===401?"needkey":"error",null,e.detail)});
     return;
@@ -589,13 +614,14 @@ function pushRemote(){
 }
 function pullRemote(){
   if(!API||!apiKey())return;
-  apiFetch("GET").then(function(r){
+  apiRetry("GET").then(function(r){
     if(r&&r.doc&&merge(r.doc)){writeLocal();all()}
     setSync("synced",r&&r.updatedAt?new Date(r.updatedAt):new Date());
   },function(e){setSync(e.code===401?"needkey":"error",null,e.detail)});
 }
 function persist(){
   writeLocal();                              // offline cache, not the source of truth
+  DIRTY=true;
   if(!DB&&!API)return;
   clearTimeout(saveTimer);
   saveTimer=setTimeout(pushRemote,600);
@@ -962,7 +988,8 @@ function probeApi(){
    moment you actually care, having just put the phone down. */
 function startPolling(){
   setInterval(function(){
-    if(!document.hidden&&SYNC.state!=="saving")pullRemote();
+    if(document.hidden||SYNC.state==="saving"||SYNC.state==="waking")return;
+    if(DIRTY)pushRemote(); else pullRemote();   // never leave a write stranded
   },30000);
   document.addEventListener("visibilitychange",function(){
     if(!document.hidden)pullRemote();

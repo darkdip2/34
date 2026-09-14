@@ -368,6 +368,12 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
     <button class="btn" id="syncNow" style="padding:4px 9px;font-size:11.5px">Sync now</button>
   </div>
   <div id="syncWhy" style="margin-top:5px;color:var(--ink-3)"></div>
+  <div id="keyBox" class="hide" style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+    <input id="keyIn" type="password" placeholder="Paste LEDGER_KEY" aria-label="Access key"
+      style="font:500 12px var(--mono);padding:6px 9px;border:1px solid var(--rule-2);
+      border-radius:5px;background:var(--panel);color:var(--ink);min-width:210px">
+    <button class="btn" id="keySave" style="padding:5px 10px;font-size:11.5px">Unlock</button>
+  </div>
   <div style="margin-top:6px">13 Sep 2026 &rarr; 26 Oct 2027</div>
 </div>
 </div>
@@ -517,27 +523,68 @@ function setSync(state,at){
   else if(state==="saving"){tx.textContent="Saving to cloud…"; why.textContent="";}
   else if(state==="error"){tx.textContent="Cloud write failed";
     why.textContent="Held on this device and will retry. Copy the JSON from the Storage tab if you need it safe now.";}
+  else if(state==="needkey"){tx.textContent="Access key needed";
+    why.textContent="This server holds your ledger but will not open it without the key. Render generated it — Dashboard → your service → Environment → LEDGER_KEY.";}
   else if(state==="none"){tx.textContent="No cloud store on this deployment";
-    why.textContent="This copy is served as plain static files, so there is no server to save to. Data stays in this browser only. The claude.ai copy has the store.";}
+    why.textContent="This copy is served as plain static files, so there is no server to save to. Data stays in this browser only.";}
   else if(state==="blocked"){tx.textContent="Cloud store unavailable";
     why.textContent="This page can reach a host but the store did not load. Data is held on this device meanwhile.";}
   else {tx.textContent="Checking store…"; why.textContent="";}
+  var kb=document.getElementById("keyBox");
+  if(kb)kb.className=(state==="needkey")?"":"hide";
+}
+
+/* ---------- the API backend (Render: Express + Postgres) ----------
+   Access is one shared key, held in this browser and sent as a bearer token.
+   The server merges per day exactly as the client does, so two devices writing
+   whole blobs cannot erase each other. */
+var KKEY="inv:key", API=false;
+function apiKey(){try{return localStorage.getItem(KKEY)||""}catch(e){return ""}}
+function setApiKey(k){try{k?localStorage.setItem(KKEY,k):localStorage.removeItem(KKEY)}catch(e){}}
+function apiFetch(method,body){
+  return fetch("/api/ledger",{
+    method:method,
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey()},
+    body:body?JSON.stringify(body):undefined
+  }).then(function(r){
+    if(r.status===401){var e=new Error("bad_key");e.code=401;throw e}
+    if(!r.ok){var x=new Error("http_"+r.status);x.code=r.status;throw x}
+    return r.json();
+  });
 }
 
 function pushRemote(){
-  if(!DB)return;
-  setSync("saving");
-  try{
-    DB.doc(DPATH).get().then(function(s){
-      if(s.exists)merge(s.data());          // never clobber another device's edit
-      return DB.doc(DPATH).set(LG);
-    }).then(function(){setSync("synced",new Date())},
-            function(){setSync("error")});
-  }catch(e){setSync("error")}
+  if(DB){
+    setSync("saving");
+    try{
+      DB.doc(DPATH).get().then(function(s){
+        if(s.exists)merge(s.data());        // never clobber another device's edit
+        return DB.doc(DPATH).set(LG);
+      }).then(function(){setSync("synced",new Date())},
+              function(){setSync("error")});
+    }catch(e){setSync("error")}
+    return;
+  }
+  if(API){
+    if(!apiKey()){setSync("needkey");return}
+    setSync("saving");
+    apiFetch("PUT",LG).then(function(r){
+      if(r&&r.doc&&merge(r.doc)){writeLocal();all()}
+      setSync("synced",new Date());
+    },function(e){setSync(e.code===401?"needkey":"error")});
+    return;
+  }
+}
+function pullRemote(){
+  if(!API||!apiKey())return;
+  apiFetch("GET").then(function(r){
+    if(r&&r.doc&&merge(r.doc)){writeLocal();all()}
+    setSync("synced",r&&r.updatedAt?new Date(r.updatedAt):new Date());
+  },function(e){setSync(e.code===401?"needkey":"error")});
 }
 function persist(){
   writeLocal();                              // offline cache, not the source of truth
-  if(!DB)return;
+  if(!DB&&!API)return;
   clearTimeout(saveTimer);
   saveTimer=setTimeout(pushRemote,600);
 }
@@ -846,26 +893,68 @@ cur=todayC();
 all();
 
 document.getElementById("syncNow").addEventListener("click",function(){
-  if(DB)pushRemote(); else setSync(window.claude?"blocked":"none");
+  if(DB){pushRemote();return}
+  if(API){pullRemote();pushRemote();return}
+  setSync(window.claude?"blocked":"none");
+});
+document.getElementById("keySave").addEventListener("click",function(){
+  var v=document.getElementById("keyIn").value.trim();
+  if(!v)return;
+  setApiKey(v); document.getElementById("keyIn").value="";
+  pullRemote(); pushRemote();
 });
 
+/* Backend discovery, in order of authority:
+   1. the artifact host, which serves its own store
+   2. an API on this origin (the Render service)
+   3. neither — this browser only */
 (function(){
-  if(!window.claude||typeof window.claude.use!=="function"){setSync("none");return}
-  setSync("checking");
-  var settled=false;
-  setTimeout(function(){if(!settled)setSync("blocked")},11000);
-  window.claude.use("db").then(function(d){
-    settled=true;
-    if(!d){setSync("blocked");return}
-    DB=d;
-    setSync("synced");
-    // Pull the shared blob, merge it under the local one, and keep watching it.
-    DB.doc(DPATH).onSnapshot(function(s){
-      if(s.exists&&merge(s.data())){writeLocal();all()}
-      setSync("synced",new Date());
-    },function(){setSync("error")});
-    // Fold anything held only on this device up to the server.
-    if(Object.keys(LG.days).length||Object.keys(LG.cp).length)pushRemote();
-  },function(){settled=true;setSync("blocked")});
+  if(window.claude&&typeof window.claude.use==="function"){
+    setSync("checking");
+    var settled=false;
+    setTimeout(function(){if(!settled)setSync("blocked")},11000);
+    window.claude.use("db").then(function(d){
+      settled=true;
+      if(!d){setSync("blocked");probeApi();return}
+      DB=d;
+      setSync("synced");
+      DB.doc(DPATH).onSnapshot(function(s){
+        if(s.exists&&merge(s.data())){writeLocal();all()}
+        setSync("synced",new Date());
+      },function(){setSync("error")});
+      if(Object.keys(LG.days).length||Object.keys(LG.cp).length)pushRemote();
+    },function(){settled=true;setSync("blocked");probeApi()});
+    return;
+  }
+  probeApi();
 })();
+
+function probeApi(){
+  if(typeof fetch!=="function"){setSync("none");return}
+  setSync("checking");
+  fetch("/api/health",{cache:"no-store"}).then(function(r){
+    if(!r.ok)throw new Error("no api");
+    return r.json();
+  }).then(function(j){
+    if(!j||j.store===undefined)throw new Error("no api");
+    API=true;
+    if(!apiKey()){setSync("needkey");return}
+    pullRemote();
+    if(Object.keys(LG.days).length||Object.keys(LG.cp).length)pushRemote();
+    startPolling();
+  })["catch"](function(){setSync("none")});
+}
+
+/* The artifact store pushes changes; a plain HTTP API cannot. Poll instead, and
+   pull immediately whenever the tab comes back to the front — which is the
+   moment you actually care, having just put the phone down. */
+function startPolling(){
+  setInterval(function(){
+    if(!document.hidden&&SYNC.state!=="saving")pullRemote();
+  },30000);
+  document.addEventListener("visibilitychange",function(){
+    if(!document.hidden)pullRemote();
+  });
+  window.addEventListener("online",function(){pullRemote();pushRemote()});
+}
 </script>

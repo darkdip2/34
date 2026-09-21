@@ -102,8 +102,11 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
 .verdict .msg{font-size:13.5px;color:var(--ink-2);flex:1;min-width:180px}
 .verdict .msg b{color:var(--ink)}
 
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+/* Each group holds exactly three, so fix three columns — auto-fit leaves an
+   orphan cell whose gap shows as a grey block. */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
   background:var(--rule);border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+@media (max-width:620px){.metrics{grid-template-columns:1fr}}
 .met{background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:7px}
 .met .lab{display:flex;align-items:center;gap:6px}
 .met .lab i{width:9px;height:9px;border-radius:2px;flex:0 0 9px}
@@ -230,16 +233,10 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
   </div>
 
   <div class="sec">
-    <div class="sec-h"><h2>Technical</h2><span class="note" id="tNote">—</span></div>
-    <div class="track" style="margin-bottom:11px"><i id="tBar" style="width:0%"></i></div>
-    <div class="metrics" id="metrics"></div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-h"><h2>Football</h2><span class="note" id="fNote">—</span></div>
-    <div class="track" style="margin-bottom:11px"><i id="fBar" style="width:0%"></i></div>
-    <div class="fblist" id="fblist"></div>
-    <div style="display:flex;align-items:center;gap:11px;margin-top:11px;flex-wrap:wrap">
+    <div class="sec-h"><h2>The seven</h2><span class="note" id="tNote">—</span></div>
+    <div class="track" style="margin-bottom:13px"><i id="tBar" style="width:0%"></i></div>
+    <div id="metrics"></div>
+    <div style="display:flex;align-items:center;gap:11px;margin-top:13px;flex-wrap:wrap">
       <button class="btn card" id="cardBtn">Use break card</button>
       <span class="mono" style="font-size:11.5px;color:var(--ink-3)" id="cardNote">—</span>
     </div>
@@ -265,24 +262,23 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
       <div class="bs"><b id="sTotal">—</b><span>Total stored</span><small>hours of investiture</small></div>
       <div class="bs"><b id="sTech">—</b><span>Technical</span><small id="sTechD">—</small></div>
       <div class="bs"><b id="sFb">—</b><span>Football</span><small id="sFbD">—</small></div>
-      <div class="bs"><b id="sDays">—</b><span>Days logged</span><small id="sDaysD">—</small></div>
+      <div class="bs"><b id="sHum">—</b><span>Humility avg</span><small id="sHumD">—</small></div>
     </div>
   </div>
 
   <div class="sec">
-    <div class="sec-h"><h2>Technical composition</h2><span class="note">Cumulative hours</span></div>
+    <div class="sec-h"><h2>Where the hours went</h2><span class="note" id="sDaysD">—</span></div>
     <div class="panel pad"><div class="split" id="composition"></div></div>
   </div>
 
   <div class="sec">
-    <div class="sec-h"><h2>Last 30 days</h2><span class="note">Technical over football</span></div>
+    <div class="sec-h"><h2>Last 30 days</h2><span class="note">Hours of the six</span></div>
     <div class="panel pad">
       <div class="chart" id="chart"></div>
       <div style="display:flex;gap:15px;margin-top:11px">
         <span class="mono" style="font-size:10.5px;color:var(--ink-3)">
-          <i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--m1)"></i> TECHNICAL</span>
-        <span class="mono" style="font-size:10.5px;color:var(--ink-3)">
-          <i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--m2)"></i> FOOTBALL</span>
+          <i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--m1)"></i>
+          HOURS PER DAY · HOVER FOR THE HUMILITY SCORE</span>
       </div>
     </div>
   </div>
@@ -380,27 +376,24 @@ nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:st
 
 <script>
 var START="2026-09-13", END="2027-10-26";
-var TECH=[["ds","Data Science","var(--m1)"],["dsa","DSA","var(--m2)"],
-          ["sql","SQL","var(--m3)"],["hum","Humility","var(--m4)"]];
-var TECH_REQ=[4,8,8,8,8,8,4];      // Sun..Sat
-var TECH_CAP=8, BAR=0.84, CARDS_PER_MONTH=2, MAX_LEVEL=20;
-
-var FB=[
- {md:"MD+1",i:[["s1","Active recovery",60],["s2","Lung protocol and peak flow",30],
-               ["s3","Match film, your own actions",60],["s4","Weekly review",60]]},
- {md:"MD+2",i:[["s1","Ball mastery and mobility",90],["s2","Lower body strength",75],
-               ["s3","Aerobic base, zone 2",45],["s4","Film study",30]]},
- {md:"MD-4",i:[["s1","Speed mechanics and passing",105],["s2","Club training or SSG",90],
-               ["s3","Core",20],["s4","Recovery and log",45]]},
- {md:"MD-3",i:[["s1","Aerobic power and dribbling",105],["s2","Upper and posterior chain",70],
-               ["s3","Finishing, 100 strikes",50],["s4","Film and recovery",45]]},
- {md:"MD-2",i:[["s1","Agility and 1v1",105],["s2","Club training or SSG",90],
-               ["s3","Mobility",30],["s4","Fuel prep and log",45]]},
- {md:"MD-1",i:[["s1","Activation and set pieces",90],["s2","Deload mobility",45],
-               ["s3","Opponent film",45],["s4","Fuel and sleep protocol",60]]},
- {md:"MD",  i:[["s1","Pre-match fuel and activation",60],["s2","MATCH",120],
-               ["s3","Cooldown and refuel",60],["s4","Post-match recovery and log",60]]}
+/* Seven things measured every single day, but they are not the same kind of
+   thing. Six are hours and share one budget: no individual cap, 14 hours
+   between them, which is the 08:00-22:00 day. Humility is not time at all -
+   it is a 1-18 score, so it never enters the hour totals or the debt. */
+var MET=[
+  ["run", "Run",                 "Football",  "var(--m2)"],
+  ["exc", "Exercise",            "Football",  "var(--m2)"],
+  ["walk","Walk",                "Football",  "var(--m2)"],
+  ["dsa", "DSA",                 "Technical", "var(--m1)"],
+  ["sql", "SQL",                 "Technical", "var(--m1)"],
+  ["dst", "Data Science theory", "Technical", "var(--m1)"]
 ];
+var GROUPS=["Football","Technical"];
+var HUM={id:"hum",label:"Humility",min:1,max:18,color:"var(--m4)"};
+var HOURS_CAP=14, HOURS_TARGET=12;
+var BAR=0.84, CARDS_PER_MONTH=2, MAX_LEVEL=20;
+function target(){return HOURS_TARGET}
+
 
 var CP=[
  ["Medical",[
@@ -492,12 +485,11 @@ function merge(remote){
 
 /* Reading a date must not create a record for it — otherwise simply paging
    through the calendar fills the blob with hollow days. Only a write creates. */
-function day(k){return LG.days[k]||{tech:{},fb:{},card:false,t:0}}
-function dayW(k){if(!LG.days[k])LG.days[k]={tech:{},fb:{},card:false,t:0};return LG.days[k]}
+function day(k){return LG.days[k]||{m:{},card:false,t:0}}
+function dayW(k){if(!LG.days[k])LG.days[k]={m:{},card:false,t:0};return LG.days[k]}
 function empty(l){
   if(l.card)return false;
-  for(var a in (l.tech||{}))if(+l.tech[a]>0)return false;
-  for(var b in (l.fb||{}))if(l.fb[b])return false;
+  for(var a in (l.m||{}))if(+l.m[a]>0)return false;
   return true;
 }
 function touch(k){
@@ -631,55 +623,71 @@ function stS(){persist()}
 
 function todayC(){var t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
   return t<S?S:(t>E?E:t)}
-function techSum(l){var t=0;for(var i=0;i<TECH.length;i++)t+= +(l.tech&&l.tech[TECH[i][0]])||0;return t}
-function fbReq(dw){var t=0,a=FB[dw].i;for(var i=0;i<a.length;i++)t+=a[i][2];return t}
-function fbDone(l,dw){var t=0,a=FB[dw].i,d=l.fb||{};
-  for(var i=0;i<a.length;i++)if(d[a[i][0]])t+=a[i][2];return t}
+function metSum(l){var t=0;for(var i=0;i<MET.length;i++)t+= +(l.m&&l.m[MET[i][0]])||0;return t}
+function metVal(l,id){return +(l.m&&l.m[id])||0}
+function humVal(l){var v=+(l.m&&l.m[HUM.id]); return (v>=HUM.min&&v<=HUM.max)?v:0}
+/* "No day skipped" is a rule, not a slogan: all six hour metrics carry
+   something, humility carries a score, and the hours reach the bar. */
+function untouched(l){
+  var out=[];
+  for(var i=0;i<MET.length;i++)if(metVal(l,MET[i][0])<=0)out.push(MET[i][1]);
+  if(!humVal(l))out.push(HUM.label);
+  return out;
+}
+function holds(l){return untouched(l).length===0&&metSum(l)>=HOURS_TARGET*BAR}
 
 /* The ledger only judges days it was open for. Debt and streak start at the
    first day carrying an entry, so days that elapsed before you began logging
    are not charged against you. Self-healing: no extra state to keep in sync. */
+function weekNo(d){var n=dif(S,d);return Math.floor(n/7)+1}
+
 function originDay(){
   var n=dif(S,todayC());
   for(var k=0;k<=n;k++){
     var l=LG.days[ymd(addD(S,k))];
-    if(l&&(techSum(l)>0||(l.fb&&Object.keys(l.fb).length>0)||l.card))return k;
+    if(l&&(metSum(l)>0||humVal(l)>0||l.card))return k;
   }
   return n;
 }
 
 /* one pass over every elapsed day: streak, debt, storage */
 function computeAll(){
-  var t=todayC(), r={tech:0,fb:0,byMetric:{},days:0,debt:0,streak:0,best:0,cards:0};
+  var t=todayC(), r={tot:0,byMetric:{},days:0,debt:0,streak:0,best:0,cards:0,
+                     groups:{},humSum:0,humDays:0,humAvg:0};
+  for(var i=0;i<MET.length;i++)r.byMetric[MET[i][0]]=0;
+  for(var g=0;g<GROUPS.length;g++)r.groups[GROUPS[g]]=0;
   var org=originDay();
-  for(var i=0;i<TECH.length;i++)r.byMetric[TECH[i][0]]=0;
-  var pass=[], n=dif(S,t), curMonth=ymd(t).slice(0,7), run=0, best=0, credit=0, owed=0;
+  var series=[], n=dif(S,t), curMonth=ymd(t).slice(0,7), run=0, best=0, credit=0, owed=0;
   for(var k=0;k<=n;k++){
-    var d=addD(S,k), key=ymd(d), dw=d.getDay(), l=LG.days[key]||{};
-    var tq=TECH_REQ[dw], ts=techSum(l), fq=fbReq(dw), fs=fbDone(l,dw), card=!!l.card;
-    var logged=ts>0||fs>0||card;
-    if(logged)r.days++;
-    r.tech+=ts; r.fb+=fs/60;
-    for(var m=0;m<TECH.length;m++)r.byMetric[TECH[m][0]]+= +(l.tech&&l.tech[TECH[m][0]])||0;
+    var d=addD(S,k), key=ymd(d), l=LG.days[key]||{};
+    var sum=metSum(l), hum=humVal(l), card=!!l.card;
+    if(sum>0||hum>0||card)r.days++;
+    r.tot+=sum;
+    if(hum>0){r.humSum+=hum;r.humDays++}
+    for(var m=0;m<MET.length;m++){
+      var v=metVal(l,MET[m][0]);
+      r.byMetric[MET[m][0]]+=v;
+      r.groups[MET[m][2]]+=v;
+    }
     if(card&&key.slice(0,7)===curMonth)r.cards++;
     var isToday=(key===ymd(t));
-    // debt and streak are only settled once a day is over, and only from the
-    // day the ledger was first used
     if(!isToday&&k>=org){
-      owed+=Math.max(0,tq-ts)+Math.max(0,(fq-fs)/60)*(card?0:1);
-      credit+=Math.max(0,ts-tq);
-      var ok=(ts>=tq*BAR)&&((fs>=fq*BAR)||card);
-      if(ok){run++;if(run>best)best=run}else run=0;
+      // Debt is hours only. Humility is a score, so a low one cannot be repaid
+      // in hours and never becomes debt - it breaks the day, nothing more.
+      if(!card){
+        owed+=Math.max(0,HOURS_TARGET-sum);
+        credit+=Math.max(0,sum-HOURS_TARGET);
+      }
+      if(holds(l)||card){run++;if(run>best)best=run}else run=0;
     }
-    pass.push({key:key,tech:ts,fb:fs/60});
+    series.push({key:key,tot:sum,hum:hum});
   }
-  // today counts toward the streak as soon as it qualifies
-  var tl=LG.days[ymd(t)]||{}, tdw=t.getDay();
-  var tOk=(techSum(tl)>=TECH_REQ[tdw]*BAR)&&((fbDone(tl,tdw)>=fbReq(tdw)*BAR)||!!tl.card);
-  r.streak=run+(tOk?1:0);
+  var tl=LG.days[ymd(t)]||{};
+  r.streak=run+((holds(tl)||!!tl.card)?1:0);
   r.best=Math.max(best,r.streak);
   r.debt=Math.max(0,owed-credit);
-  r.series=pass;
+  r.humAvg=r.humDays?r.humSum/r.humDays:0;
+  r.series=series;
   return r;
 }
 function cpAll(){var a=[];for(var i=0;i<CP.length;i++)a=a.concat(CP[i][1]);return a}
@@ -703,79 +711,99 @@ function rHeader(){
 }
 
 function rDaily(){
-  var dw=cur.getDay(), l=day(ymd(cur)), tq=TECH_REQ[dw], ts=techSum(l);
-  document.getElementById("dDow").textContent=DOW[dw];
+  var l=day(ymd(cur)), sum=metSum(l), hum=humVal(l), room=HOURS_CAP-sum;
+  document.getElementById("dDow").textContent=DOW[cur.getDay()];
   document.getElementById("dDate").textContent=fmt(cur);
-  document.getElementById("dMd").textContent=FB[dw].md;
+  document.getElementById("dMd").textContent="Week "+weekNo(cur);
 
-  var mh="";
-  for(var i=0;i<TECH.length;i++){
-    var m=TECH[i], v=(l.tech&&l.tech[m[0]])!==undefined?l.tech[m[0]]:"";
-    mh+='<div class="met"><div class="lab"><i style="background:'+m[2]+'"></i><span>'+m[1]+'</span></div>'+
-        '<input type="number" min="0" max="8" step="0.5" inputmode="decimal" data-m="'+m[0]+
-        '" value="'+v+'" placeholder="0" aria-label="'+m[1]+' hours"><span class="hint">hours</span></div>';
+  var html="";
+  for(var g=0;g<GROUPS.length;g++){
+    var grp=GROUPS[g], cards="";
+    for(var i=0;i<MET.length;i++){
+      if(MET[i][2]!==grp)continue;
+      var m=MET[i], raw=(l.m&&l.m[m[0]]!==undefined)?l.m[m[0]]:"";
+      var hit=metVal(l,m[0])>0;
+      cards+='<div class="met"><div class="lab"><i style="background:'+m[3]+
+        (hit?'':';opacity:.28')+'"></i><span>'+m[1]+'</span></div>'+
+        '<input type="number" min="0" max="'+HOURS_CAP+'" step="0.25" inputmode="decimal" data-m="'+m[0]+
+        '" value="'+raw+'" placeholder="0" aria-label="'+m[1]+' hours"><span class="hint">hours</span></div>';
+    }
+    html+='<div class="eyebrow" style="margin:'+(g?"16px":"0")+' 0 7px">'+grp+
+          ' <span style="color:var(--ink-3);font-weight:500">· shares the 14 h budget</span></div>'+
+          '<div class="metrics">'+cards+'</div>';
   }
-  document.getElementById("metrics").innerHTML=mh;
-  document.getElementById("tNote").textContent=h1(ts)+" / "+tq+" hrs · cap "+TECH_CAP;
+  // Humility is scored, not clocked, so it gets its own control and its own row.
+  html+='<div class="eyebrow" style="margin:16px 0 7px">Common · scored '+HUM.min+'–'+HUM.max+'</div>'+
+    '<div class="metrics"><div class="met" style="grid-column:1/-1">'+
+    '<div class="lab"><i style="background:'+HUM.color+(hum?'':';opacity:.28')+'"></i><span>'+HUM.label+'</span></div>'+
+    '<div style="display:flex;align-items:center;gap:14px">'+
+    '<input type="number" min="'+HUM.min+'" max="'+HUM.max+'" step="1" inputmode="numeric" id="humIn"'+
+    ' value="'+(hum||"")+'" placeholder="—" aria-label="Humility score" style="max-width:88px">'+
+    '<input type="range" min="'+HUM.min+'" max="'+HUM.max+'" step="1" id="humRange"'+
+    ' value="'+(hum||HUM.min)+'" aria-label="Humility score slider"'+
+    ' style="flex:1;accent-color:'+HUM.color+'"></div>'+
+    '<span class="hint">not hours · never counts toward the 14</span></div></div>';
+  document.getElementById("metrics").innerHTML=html;
+
+  document.getElementById("tNote").textContent=
+    h1(sum)+" / "+h1(HOURS_TARGET)+" hrs · "+h1(room)+" h left of 14";
   var tb=document.getElementById("tBar");
-  tb.style.width=Math.min(100,tq?ts/tq*100:100)+"%";
-  tb.parentNode.className="track "+(ts>=tq*BAR?"ok":(ts>0?"":"no"));
-
-  var a=FB[dw].i, dn=l.fb||{}, fh="", fq=fbReq(dw), fs=fbDone(l,dw);
-  for(var j=0;j<a.length;j++){
-    var on=!!dn[a[j][0]];
-    fh+='<div class="fbrow'+(on?" done":"")+'"><span class="t">'+a[j][1]+'</span>'+
-        '<span class="m">'+a[j][2]+' min</span>'+
-        '<input type="checkbox" data-f="'+a[j][0]+'"'+(on?" checked":"")+' aria-label="'+a[j][1]+'"></div>';
-  }
-  document.getElementById("fblist").innerHTML=fh;
-  document.getElementById("fNote").textContent=Math.round(fs/fq*100)+"% · "+fs+" / "+fq+" min";
-  var fb=document.getElementById("fBar");
-  fb.style.width=Math.min(100,fs/fq*100)+"%";
-  fb.parentNode.className="track "+(fs>=fq*BAR?"ok":(fs>0?"":"no"));
+  tb.style.width=Math.min(100,sum/HOURS_TARGET*100)+"%";
+  tb.parentNode.className="track "+(holds(l)?"ok":(sum>0?"":"no"));
 
   var R=computeAll(), left=CARDS_PER_MONTH-R.cards;
   var cb=document.getElementById("cardBtn");
   cb.classList.toggle("on",!!l.card);
   cb.textContent=l.card?"Break card used":"Use break card";
   cb.disabled=!l.card&&left<=0;
-  document.getElementById("cardNote").textContent=Math.max(0,left)+" of "+CARDS_PER_MONTH+" left this month · football only";
+  document.getElementById("cardNote").textContent=
+    Math.max(0,left)+" of "+CARDS_PER_MONTH+" left this month";
 
-  var tOk=ts>=tq*BAR, fOk=(fs>=fq*BAR)||!!l.card;
-  var v=document.getElementById("verdict"), mk=document.getElementById("vMark"), ms=document.getElementById("vMsg");
-  var isToday=ymd(cur)===ymd(todayC());
-  if(tOk&&fOk){
+  var v=document.getElementById("verdict"), mk=document.getElementById("vMark"),
+      ms=document.getElementById("vMsg"), isToday=ymd(cur)===ymd(todayC());
+  var miss=untouched(l);
+  if(l.card){
+    v.className="verdict pass"; mk.textContent="Card";
+    ms.innerHTML="Break card spent. The day holds and no debt is owed.";
+  }else if(holds(l)){
     v.className="verdict pass"; mk.textContent="Held";
-    ms.innerHTML="Both bars cleared. Streak <b>"+R.streak+" days</b>.";
-  }else if(ts===0&&fs===0&&!l.card&&isToday){
+    ms.innerHTML="All seven measured, hours cleared. Streak <b>"+R.streak+" days</b>.";
+  }else if(sum===0&&!hum&&isToday){
     v.className="verdict open"; mk.textContent="Open";
-    ms.innerHTML="Nothing ingested yet. Need <b>"+h1(tq*BAR)+" technical hours</b> and <b>"+
-      Math.ceil(fq*BAR)+" football minutes</b>.";
+    ms.innerHTML="Nothing measured. Six need hours totalling <b>"+h1(HOURS_TARGET*BAR)+
+      "</b>, and humility needs a score.";
   }else{
     v.className="verdict fail"; mk.textContent="Broken";
     var why=[];
-    if(!tOk)why.push("technical short by <b>"+h1(Math.max(0,tq*BAR-ts))+"h</b>");
-    if(!fOk)why.push("football short by <b>"+Math.ceil(Math.max(0,fq*BAR-fs))+" min</b>");
-    ms.innerHTML=why.join(", ")+". Shortfall against the full requirement is added to debt at 1&times;.";
+    if(miss.length)why.push("<b>"+miss.length+" unmeasured</b> — "+miss.join(", "));
+    if(sum<HOURS_TARGET*BAR)why.push("hours short by <b>"+h1(HOURS_TARGET*BAR-sum)+"</b>");
+    ms.innerHTML=why.join(" · ")+". Shortfall against "+h1(HOURS_TARGET)+" hrs is added to debt at 1&times;.";
   }
 
   var ins=document.getElementById("metrics").querySelectorAll("input[data-m]");
-  for(var q=0;q<ins.length;q++)ins[q].addEventListener("change",onTech);
-  var fbs=document.getElementById("fblist").querySelectorAll("input[data-f]");
-  for(var z=0;z<fbs.length;z++)fbs[z].addEventListener("change",onFb);
+  for(var z=0;z<ins.length;z++)ins[z].addEventListener("change",onTech);
+  document.getElementById("humIn").addEventListener("change",onHum);
+  document.getElementById("humRange").addEventListener("change",onHum);
 }
 function onTech(ev){
-  var l=dayW(ymd(cur)); if(!l.tech)l.tech={};
-  var k=ev.target.getAttribute("data-m"), val=ev.target.value===""?null:Math.max(0,+ev.target.value||0);
-  if(val===null)delete l.tech[k]; else l.tech[k]=val;
-  var s=techSum(l);
-  if(s>TECH_CAP){ l.tech[k]=Math.max(0,val-(s-TECH_CAP)); }
+  var l=dayW(ymd(cur)); if(!l.m)l.m={};
+  var k=ev.target.getAttribute("data-m");
+  var val=ev.target.value===""?null:Math.max(0,+ev.target.value||0);
+  if(val===null){delete l.m[k]}
+  else{
+    // No individual cap, but the six share 14 hours. Clamp to what is left
+    // rather than silently accepting an impossible day.
+    var others=0;
+    for(var i=0;i<MET.length;i++)if(MET[i][0]!==k)others+=metVal(l,MET[i][0]);
+    l.m[k]=Math.min(val,Math.max(0,HOURS_CAP-others));
+  }
   saveDay(ymd(cur)); rDaily(); rHeader();
 }
-function onFb(ev){
-  var l=dayW(ymd(cur)); if(!l.fb)l.fb={};
-  var k=ev.target.getAttribute("data-f");
-  if(ev.target.checked)l.fb[k]=true; else delete l.fb[k];
+function onHum(ev){
+  var l=dayW(ymd(cur)); if(!l.m)l.m={};
+  var val=ev.target.value===""?null:Math.round(+ev.target.value||0);
+  if(val===null)delete l.m[HUM.id];
+  else l.m[HUM.id]=Math.min(HUM.max,Math.max(HUM.min,val));
   saveDay(ymd(cur)); rDaily(); rHeader();
 }
 document.getElementById("cardBtn").addEventListener("click",function(){
@@ -813,37 +841,38 @@ function rCp(){
 }
 
 function rStore(){
-  var R=computeAll(), tot=R.tech+R.fb;
+  var R=computeAll(), tot=R.tot;
   document.getElementById("sTotal").textContent=h1(tot);
-  document.getElementById("sTech").textContent=h1(R.tech);
-  document.getElementById("sFb").textContent=h1(R.fb);
-  document.getElementById("sDays").textContent=R.days;
-  document.getElementById("sTechD").textContent=tot?Math.round(R.tech/tot*100)+"% of store":"—";
-  document.getElementById("sFbD").textContent=tot?Math.round(R.fb/tot*100)+"% of store":"—";
-  document.getElementById("sDaysD").textContent="of "+(dif(S,todayC())+1)+" elapsed";
+  document.getElementById("sTech").textContent=h1(R.groups["Technical"]);
+  document.getElementById("sFb").textContent=h1(R.groups["Football"]);
+  document.getElementById("sTechD").textContent=tot?Math.round(R.groups["Technical"]/tot*100)+"% of store":"—";
+  document.getElementById("sFbD").textContent=tot?Math.round(R.groups["Football"]/tot*100)+"% of store":"—";
+  document.getElementById("sHum").textContent=R.humDays?R.humAvg.toFixed(1):"—";
+  document.getElementById("sHumD").textContent=R.humDays?("over "+R.humDays+" days · of "+HUM.max):"not scored yet";
+  document.getElementById("sDaysD").textContent=R.days+" of "+(dif(S,todayC())+1)+" days logged";
 
   var mx=0;
-  for(var i=0;i<TECH.length;i++)mx=Math.max(mx,R.byMetric[TECH[i][0]]);
+  for(var i=0;i<MET.length;i++)mx=Math.max(mx,R.byMetric[MET[i][0]]);
   var ch="";
-  for(var j=0;j<TECH.length;j++){
-    var m=TECH[j], v=R.byMetric[m[0]];
-    ch+='<div class="srow"><span class="l"><i style="background:'+m[2]+'"></i>'+m[1]+'</span>'+
-      '<span class="track"><i style="width:'+(mx?v/mx*100:0)+'%;background:'+m[2]+'"></i></span>'+
+  for(var j=0;j<MET.length;j++){
+    var m=MET[j], v=R.byMetric[m[0]];
+    ch+='<div class="srow"><span class="l"><i style="background:'+m[3]+'"></i>'+m[1]+'</span>'+
+      '<span class="track"><i style="width:'+(mx?v/mx*100:0)+'%;background:'+m[3]+'"></i></span>'+
       '<span class="v">'+h1(v)+'h</span></div>';
   }
   document.getElementById("composition").innerHTML=ch;
 
   var ser=R.series.slice(-30), peak=1;
-  for(var k=0;k<ser.length;k++)peak=Math.max(peak,ser[k].tech+ser[k].fb);
+  for(var k=0;k<ser.length;k++)peak=Math.max(peak,ser[k].tot);
   var gh="";
   for(var z=0;z<ser.length;z++){
-    var d=ser[z], th=d.tech/peak*100, fh=d.fb/peak*100;
-    gh+='<div class="c" title="'+d.key+'"><i class="fb" style="height:'+fh+'%"></i>'+
-        '<i class="tech" style="height:'+th+'%"></i></div>';
+    var d=ser[z];
+    gh+='<div class="c" title="'+d.key+' · '+h1(d.tot)+'h'+(d.hum?" · humility "+d.hum:"")+'">'+
+        '<i class="tech" style="height:'+(d.tot/peak*100)+'%"></i></div>';
   }
   document.getElementById("chart").innerHTML=gh;
   document.getElementById("dOut").textContent=R.debt>0?h1(R.debt)+" hrs":"none";
-  document.getElementById("dClear").textContent=R.debt>0?"log beyond the daily requirement":"balanced";
+  document.getElementById("dClear").textContent=R.debt>0?"log beyond "+h1(HOURS_TARGET)+" hrs in a day":"balanced";
 
   var js=JSON.stringify(LG), box=document.getElementById("jBox");
   if(document.activeElement!==box)box.value=js;

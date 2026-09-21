@@ -3,7 +3,7 @@
 A 59-week operating console for the run from data analyst to a professional
 football contract by **26 October 2027**.
 
-Programme start 13 September 2026. The day is planned hour by hour from 08:00 to
+Programme start 21 September 2026. The day is planned hour by hour from 08:00 to
 22:00 around a 10:00–19:00 job, on a matchday-relative microcycle with Saturday
 as the match. Alongside it: physical benchmarks against professional entry
 standards, the medical critical path, and what the programme costs to self-fund.
